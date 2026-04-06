@@ -17,7 +17,8 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--light);
             margin: 0;
-            padding-bottom: 100px;
+            /* Aumentato il padding per non coprire gli ultimi prodotti */
+            padding-bottom: 160px; 
         }
 
         header {
@@ -74,59 +75,67 @@
         .controls {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
 
         .btn-qty {
             background: var(--secondary);
             border: none;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Barra Ordine in basso */
+        /* Barra Ordine in basso aggiornata */
         .cart-bar {
             position: fixed;
             bottom: 0;
+            left: 0;
             width: 100%;
             background: white;
-            padding: 15px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
+            z-index: 1000;
         }
 
-        input[type="text"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 80%;
-            max-width: 300px;
+        #total-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark);
         }
 
         .btn-send {
-            background-color: #25D366; /* Colore WhatsApp */
+            background-color: #25D366;
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
+            padding: 15px 40px;
+            border-radius: 30px;
             font-weight: bold;
+            font-size: 1rem;
             text-decoration: none;
             cursor: pointer;
+            transition: transform 0.2s;
         }
 
-        .hidden { display: none; }
+        .btn-send:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>La Verdura Fresca di Leoluca Clini</h1>
+    <h1>L'orto di Mezza Luna</h1>
     <p>Scegli i prodotti e prenota su WhatsApp</p>
 </header>
 
@@ -137,15 +146,12 @@
 </div>
 
 <div class="cart-bar">
-    <input type="text" id="customer-name" placeholder="Il tuo nome">
     <div id="total-display">Totale: 0.00 €</div>
-    <button class="btn-send" onclick="sendOrder()">Prenota su WhatsApp</button>
+    <button class="btn-send" onclick="confirmAndSend()">Prenota su WhatsApp</button>
 </div>
 
 <script>
-    // 1. INSERISCI QUI IL LINK CSV DI GOOGLE SHEETS
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQfuyKN0VDDVw9wil0C9gXieyh1MnZjyRbijRqf9tQzmuThtVErJjkqkR2GE1IRBGuCS1FH0iR0-hAK/pub?output=csv'; 
-    // 2. INSERISCI QUI IL NUMERO DEL CONTADINO (con prefisso 39)
     const PHONE_NUMBER = '393348462556'; 
 
     let products = [];
@@ -155,18 +161,19 @@
         try {
             const response = await fetch(SHEET_URL);
             const data = await response.text();
-            const rows = data.split('\n').slice(1); // Salta l'intestazione
+            const rows = data.split('\n').slice(1);
 
             const container = document.getElementById('product-list');
             container.innerHTML = '';
 
             rows.forEach((row, index) => {
-                const cols = row.split(','); // Divide le colonne
+                // Pulizia della riga per gestire eventuali virgole nei testi tra virgolette
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 if (cols.length < 3) return;
 
                 const p = {
                     id: index,
-                    name: cols[0].trim(),
+                    name: cols[0].replace(/"/g, '').trim(),
                     price: parseFloat(cols[2]),
                     unit: cols[3].trim(),
                     available: cols[4].trim().toUpperCase() === 'SÌ',
@@ -212,34 +219,33 @@
         document.getElementById('total-display').innerText = `Totale: ${total.toFixed(2)} €`;
     }
 
-    function sendOrder() {
-        const name = document.getElementById('customer-name').value;
-        if (!name) {
-            alert("Per favore, inserisci il tuo nome.");
-            return;
-        }
-
-        let orderText = `Ciao! Sono ${name}. Vorrei ordinare:\n`;
-        let hasItems = false;
+    function confirmAndSend() {
+        let orderList = "";
         let total = 0;
+        let hasItems = false;
 
         products.forEach(p => {
             if (cart[p.id] > 0) {
-                orderText += `- ${p.name}: ${cart[p.id]} ${p.unit}\n`;
-                total += p.price * cart[p.id];
+                const subtotal = p.price * cart[p.id];
+                orderList += `- ${p.name}: ${cart[p.id]} ${p.unit} (${subtotal.toFixed(2)}€)\n`;
+                total += subtotal;
                 hasItems = true;
             }
         });
 
         if (!hasItems) {
-            alert("Il carrello è vuoto!");
+            alert("Il carrello è vuoto! Seleziona almeno un prodotto.");
             return;
         }
 
-        orderText += `\n*Totale: ${total.toFixed(2)}€*`;
-        
-        const waLink = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(orderText)}`;
-        window.open(waLink, '_blank');
+        // Messaggio di riepilogo per l'utente
+        const summary = `RIEPILOGO ORDINE:\n\n${orderList}\nTOTALE: ${total.toFixed(2)}€\n\nVuoi confermare e inviare l'ordine su WhatsApp?`;
+
+        if (confirm(summary)) {
+            const orderText = `Ciao! Vorrei prenotare questi prodotti:\n\n${orderList}\n*TOTALE: ${total.toFixed(2)}€*`;
+            const waLink = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(orderText)}`;
+            window.open(waLink, '_blank');
+        }
     }
 
     loadProducts();
