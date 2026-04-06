@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'orto di Mezza Luna</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2d6a4f;
+            --secondary: #95d5b2;
+            --light: #f8f9fa;
+            --dark: #1b4332;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light);
+            margin: 0;
+            padding-bottom: 100px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 1rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            font-size: 1rem;
+            margin: 5px 0;
+            color: var(--dark);
+        }
+
+        .price {
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-qty {
+            background: var(--secondary);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Barra Ordine in basso */
+        .cart-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .btn-send {
+            background-color: #25D366; /* Colore WhatsApp */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>La Verdura Fresca di Leoluca Clini</h1>
+    <p>Scegli i prodotti e prenota su WhatsApp</p>
+</header>
+
+<div class="container">
+    <div id="product-list" class="product-grid">
+        <p>Caricamento prodotti freschi...</p>
+    </div>
+</div>
+
+<div class="cart-bar">
+    <input type="text" id="customer-name" placeholder="Il tuo nome">
+    <div id="total-display">Totale: 0.00 €</div>
+    <button class="btn-send" onclick="sendOrder()">Prenota su WhatsApp</button>
+</div>
+
+<script>
+    // 1. INSERISCI QUI IL LINK CSV DI GOOGLE SHEETS
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQfuyKN0VDDVw9wil0C9gXieyh1MnZjyRbijRqf9tQzmuThtVErJjkqkR2GE1IRBGuCS1FH0iR0-hAK/pub?output=csv'; 
+    // 2. INSERISCI QUI IL NUMERO DEL CONTADINO (con prefisso 39)
+    const PHONE_NUMBER = '393348462556'; 
+
+    let products = [];
+    let cart = {};
+
+    async function loadProducts() {
+        try {
+            const response = await fetch(SHEET_URL);
+            const data = await response.text();
+            const rows = data.split('\n').slice(1); // Salta l'intestazione
+
+            const container = document.getElementById('product-list');
+            container.innerHTML = '';
+
+            rows.forEach((row, index) => {
+                const cols = row.split(','); // Divide le colonne
+                if (cols.length < 3) return;
+
+                const p = {
+                    id: index,
+                    name: cols[0].trim(),
+                    price: parseFloat(cols[2]),
+                    unit: cols[3].trim(),
+                    available: cols[4].trim().toUpperCase() === 'SÌ',
+                    img: cols[5] ? cols[5].trim() : 'https://via.placeholder.com/150?text=Verdura'
+                };
+
+                if (p.available) {
+                    products.push(p);
+                    container.innerHTML += `
+                        <div class="card">
+                            <img src="${p.img}" alt="${p.name}">
+                            <h3>${p.name}</h3>
+                            <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
+                            <div class="controls">
+                                <button class="btn-qty" onclick="changeQty(${p.id}, -1)">-</button>
+                                <span id="qty-${p.id}">0</span>
+                                <button class="btn-qty" onclick="changeQty(${p.id}, 1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        } catch (error) {
+            console.error("Errore caricamento:", error);
+            document.getElementById('product-list').innerHTML = "Errore nel caricamento dei prodotti.";
+        }
+    }
+
+    function changeQty(id, delta) {
+        if (!cart[id]) cart[id] = 0;
+        cart[id] += delta;
+        if (cart[id] < 0) cart[id] = 0;
+        
+        document.getElementById(`qty-${id}`).innerText = cart[id];
+        updateTotal();
+    }
+
+    function updateTotal() {
+        let total = 0;
+        products.forEach(p => {
+            if (cart[p.id]) total += p.price * cart[p.id];
+        });
+        document.getElementById('total-display').innerText = `Totale: ${total.toFixed(2)} €`;
+    }
+
+    function sendOrder() {
+        const name = document.getElementById('customer-name').value;
+        if (!name) {
+            alert("Per favore, inserisci il tuo nome.");
+            return;
+        }
+
+        let orderText = `Ciao! Sono ${name}. Vorrei ordinare:\n`;
+        let hasItems = false;
+        let total = 0;
+
+        products.forEach(p => {
+            if (cart[p.id] > 0) {
+                orderText += `- ${p.name}: ${cart[p.id]} ${p.unit}\n`;
+                total += p.price * cart[p.id];
+                hasItems = true;
+            }
+        });
+
+        if (!hasItems) {
+            alert("Il carrello è vuoto!");
+            return;
+        }
+
+        orderText += `\n*Totale: ${total.toFixed(2)}€*`;
+        
+        const waLink = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(orderText)}`;
+        window.open(waLink, '_blank');
+    }
+
+    loadProducts();
+</script>
+
+</body>
+</html>
