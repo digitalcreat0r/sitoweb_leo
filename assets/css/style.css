@@ -223,7 +223,7 @@ footer {
 }
 
 .site-footer {
-    padding: 2rem 0;
+    padding: 3rem 0 1.5rem 0;
     margin-top: 3rem;
     border-top: 1px solid #eee;
     text-align: center;
@@ -232,16 +232,35 @@ footer {
 }
 
 .legal-info {
-    margin: 1rem 0;
-    line-height: 1.6;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+.legal-info strong {
+    color: var(--dark);
+    font-size: 1rem;
+}
+
+.footer-nav {
+    margin-bottom: 2rem;
 }
 
 .footer-nav a {
     color: #666;
     text-decoration: none;
-    margin: 0 5px;
+    margin: 0 10px; /* Spaziatura tra i link */
+    font-size: 0.85rem;
 }
 
 .footer-nav a:hover {
+    color: var(--primary);
     text-decoration: underline;
+}
+
+.footer-copyright {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    opacity: 0.7;
 }

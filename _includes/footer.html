@@ -1,21 +1,24 @@
 <footer class="site-footer">
     <div class="container">
         <div class="footer-content">
-            <p>&copy; {{ 'now' | date: "%Y" }} <strong>{{ site.title }}</strong>. Tutti i diritti riservati.</p>
-            
             <div class="legal-info">
                 <p>
-                    {{ site.company_name }} | Sede legale: {{ site.address }}<br>
+                    <strong>{{ site.company_name }}</strong><br>
+                    Sede legale: {{ site.address }}<br>
                     P.IVA: {{ site.p_iva }} | C.F.: {{ site.codice_fiscale }} | REA: {{ site.rea }}<br>
-                    EMAIL: <a href="mailto:{{ site.pec }}">{{ site.email }}</a>
+                    Email: <a href="mailto:{{ site.email }}">{{ site.email }}</a>
                 </p>
             </div>
 
             <nav class="footer-nav">
-                <a href="{{ '/privacy-policy' | relative_url }}">Privacy Policy</a> |
-                <a href="{{ '/cookie-policy' | relative_url }}">Cookie Policy</a> |
+                <a href="{{ '/privacy-policy' | relative_url }}">Privacy Policy</a>
+                <a href="{{ '/cookie-policy' | relative_url }}">Cookie Policy</a>
                 <a href="{{ '/termini-e-condizioni' | relative_url }}">Condizioni di Vendita</a>
             </nav>
+
+            <div class="footer-copyright">
+                <p>&copy; {{ 'now' | date: "%Y" }} {{ site.title }}. Tutti i diritti riservati.</p>
+            </div>
         </div>
     </div>
 </footer>
