@@ -11,7 +11,9 @@
 
     {% include footer.html %}
 
-    {% include cart_bar.html %}
+    {% if page.url == "/" %}
+        {% include cart_bar.html %}
+    {% endif %}
 
     <script>
         const AppConfig = {
