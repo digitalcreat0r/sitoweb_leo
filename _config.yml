@@ -1,0 +1,6 @@
+title: "L'orto di Mezza Luna"
+description: "Scegli i prodotti freschi e prenota su WhatsApp"
+whatsapp_number: "393345613301"
+sheet_url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfuyKN0VDDVw9wil0C9gXieyh1MnZjyRbijRqf9tQzmuThtVErJjkqkR2GE1IRBGuCS1FH0iR0-hAK/pub?output=csv"
+url: "https://github.com/digitalcreat0r/sitoweb_leo" # Inserisci qui l'URL finale di GitHub Pages (es. https://tuousername.github.io/orto)
+baseurl: "" # Lascia vuoto se è un dominio personalizzato, altrimenti metti "/nome-repo"

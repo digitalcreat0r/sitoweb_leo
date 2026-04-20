@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="it">
+{% include head.html %}
+<body>
+
+    {% include header.html %}
+
+    <main class="container">
+        {{ content }}
+    </main>
+
+    {% include footer.html %}
+
+    {% include cart_bar.html %}
+
+    <script>
+        const AppConfig = {
+            sheetUrl: "{{ site.sheet_url }}",
+            phoneNumber: "{{ site.whatsapp_number }}"
+        };
+    </script>
+    
+    <script src="{{ '/assets/js/app.js' | relative_url }}"></script>
+
+</body>
+</html>
