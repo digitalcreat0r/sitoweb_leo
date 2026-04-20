@@ -1,6 +1,37 @@
 ---
 layout: default
 ---
-<div id="product-list" class="product-grid">
-    <p>Caricamento prodotti freschi in corso...</p>
+<div class="home-sections">
+    
+    <section class="section-vetrina">
+        <h2 class="section-title">I nostri prodotti freschi</h2>
+        <div id="product-list" class="product-grid">
+            <p>Caricamento prodotti in corso...</p>
+        </div>
+        <button id="btn-show-all" class="btn-secondary" style="display: none;" onclick="showAllProducts()">
+            Mostra tutti i prodotti
+        </button>
+    </section>
+
+    <section class="section-info">
+        <details class="accordion">
+            <summary>🚚 Come funziona e Consegna</summary>
+            <div class="accordion-content">
+                <p><strong>Come ordinare:</strong> Aggiungi i prodotti al carrello e invia l'ordine direttamente sul nostro WhatsApp.</p>
+                <p><strong>Consegna:</strong> Consegniamo il Martedì e il Venerdì nella zona di [Tua Zona]. La consegna è gratuita per ordini superiori a 20€!</p>
+                <p><strong>Pagamento:</strong> Puoi pagare in contanti alla consegna o tramite Satispay.</p>
+            </div>
+        </details>
+    </section>
+
+    <section class="section-bio">
+        <details class="accordion">
+            <summary>🌱 Chi siamo</summary>
+            <div class="accordion-content">
+                <p>Siamo una piccola azienda agricola locale. Coltiviamo le nostre verdure seguendo i ritmi della natura, senza usare pesticidi chimici.</p>
+                <p>Il nostro obiettivo è portare dal campo alla tua tavola prodotti freschi, genuini e a km zero.</p>
+            </div>
+        </details>
+    </section>
+
 </div>

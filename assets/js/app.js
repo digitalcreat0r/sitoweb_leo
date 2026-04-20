@@ -1,15 +1,17 @@
 let products = [];
 let cart = {};
+const LIMIT_HOME_PRODUCTS = 3;
 
 async function loadProducts() {
     try {
-        // Usiamo AppConfig.sheetUrl passata da Jekyll
         const response = await fetch(AppConfig.sheetUrl);
         const data = await response.text();
         const rows = data.split('\n').slice(1);
 
         const container = document.getElementById('product-list');
         container.innerHTML = '';
+        
+        let visibleCount = 0;
 
         rows.forEach((row, index) => {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -26,8 +28,13 @@ async function loadProducts() {
 
             if (p.available) {
                 products.push(p);
+                visibleCount++;
+                
+                // Se superiamo il limite, nascondiamo la card aggiungendo 'display: none'
+                const isHidden = visibleCount > LIMIT_HOME_PRODUCTS ? 'style="display:none;" class="card extra-product"' : 'class="card"';
+
                 container.innerHTML += `
-                    <div class="card">
+                    <div ${isHidden}>
                         <img src="${p.img}" alt="${p.name}">
                         <h3>${p.name}</h3>
                         <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
@@ -40,10 +47,25 @@ async function loadProducts() {
                 `;
             }
         });
+
+        // Mostra il pulsante "Mostra tutti" se ci sono più prodotti del limite
+        if (visibleCount > LIMIT_HOME_PRODUCTS) {
+            document.getElementById('btn-show-all').style.display = 'block';
+        }
+
     } catch (error) {
         console.error("Errore caricamento:", error);
         document.getElementById('product-list').innerHTML = "Errore nel caricamento dei prodotti. Riprova più tardi.";
     }
+}
+
+function showAllProducts() {
+    // Trova tutti i prodotti nascosti e li mostra
+    document.querySelectorAll('.extra-product').forEach(el => {
+        el.style.display = 'flex'; // Usiamo flex perché la tua classe .card usa flexbox
+    });
+    // Nasconde il pulsante dopo averci cliccato
+    document.getElementById('btn-show-all').style.display = 'none';
 }
 
 function changeQty(id, delta) {

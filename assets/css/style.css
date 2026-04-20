@@ -127,6 +127,92 @@ header {
     transform: scale(0.95);
 }
 
+
+.home-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Spazio tra le 3 sezioni */
+    margin-top: 20px;
+}
+
+.section-title {
+    color: var(--dark);
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.btn-secondary {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto 0 auto;
+    padding: 12px 20px;
+    background-color: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.btn-secondary:active {
+    background-color: var(--secondary);
+    color: var(--dark);
+}
+
+.accordion {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.accordion summary {
+    padding: 18px 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--dark);
+    cursor: pointer;
+    list-style: none; /* Nasconde la freccia di default su alcuni browser */
+    position: relative;
+    outline: none;
+}
+
+/* Aggiungiamo un'icona personalizzata per la freccia della tendina */
+.accordion summary::after {
+    content: '+';
+    position: absolute;
+    right: 20px;
+    font-size: 1.5rem;
+    color: var(--primary);
+    transition: transform 0.3s ease;
+}
+
+.accordion[open] summary::after {
+    content: '-';
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    padding: 0 15px 20px 15px;
+    color: #444;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    border-top: 1px solid #eee;
+    margin-top: 5px;
+    padding-top: 15px;
+}
+
+.accordion-content p {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+
 footer {
     text-align: center;
     padding: 20px 10px;
