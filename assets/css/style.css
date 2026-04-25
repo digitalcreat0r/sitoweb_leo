@@ -185,10 +185,10 @@ header {
 
 /* Aggiungiamo un'icona personalizzata per la freccia della tendina */
 .accordion summary::after {
-    content: '▼';
+    content: '⌄';
     position: absolute;
     right: 20px;
-    font-size: 0.8rem;
+    font-size: 1.2rem;
     color: var(--primary);
     transition: transform 0.3s ease;
 }
