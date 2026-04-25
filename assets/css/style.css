@@ -177,7 +177,7 @@ header {
 
 .accordion summary {
     padding: 18px 15px;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: var(--dark);
     cursor: pointer;
@@ -206,7 +206,7 @@ header {
     padding: 0 15px 20px 15px;
     color: #444;
     line-height: 1.5;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     border-top: 1px solid #eee;
     margin-top: 5px;
     padding-top: 15px;
@@ -232,7 +232,7 @@ footer {
     margin-top: 3rem;
     border-top: 1px solid #eee;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #666;
 }
 
@@ -254,7 +254,7 @@ footer {
     color: #666;
     text-decoration: none;
     margin: 0 10px; /* Spaziatura tra i link */
-    font-size: 0.85rem;
+    font-size: 0.95rem;
 }
 
 @media (hover: hover) {
@@ -268,7 +268,7 @@ footer {
     border-top: 1px solid #f0f0f0;
     padding-top: 1.5rem;
     margin-top: 1rem;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     opacity: 0.7;
 }
 
