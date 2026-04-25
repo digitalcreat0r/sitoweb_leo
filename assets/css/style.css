@@ -257,9 +257,11 @@ footer {
     font-size: 0.85rem;
 }
 
-.footer-nav a:hover {
-    color: var(--primary);
-    text-decoration: underline;
+@media (hover: hover) {
+    .footer-nav a:hover {
+        color: var(--primary);
+        text-decoration: underline;
+    }
 }
 
 .footer-copyright {
