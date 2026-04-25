@@ -192,14 +192,14 @@ header {
     position: absolute;
     right: 20px;
     top: 50%;
-    transform: translateY(-50%) scale(1.6, 0.6);
+    transform: translateY(-50%) scale(1.5, 0.7);
     font-size: 1.8rem;
     color: var(--primary);
     transition: transform 0.3s ease;
 }
 
 .accordion[open] summary::after {
-    transform: translateY(-50%) rotate(180deg) scale(1.6, 0.6);
+    transform: translateY(-50%) rotate(180deg) scale(1.5, 0.7);
 }
 
 .accordion-content {
