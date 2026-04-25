@@ -58,9 +58,13 @@ header {
 }
 
 .card h3 {
-    font-size: 1rem;
+    font-size: 1.2rem;
     margin: 5px 0;
     color: var(--dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 .price {
