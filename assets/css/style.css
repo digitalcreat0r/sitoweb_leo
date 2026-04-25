@@ -169,6 +169,7 @@ header {
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     overflow: hidden;
+    margin-bottom: 15px;
 }
 
 .accordion summary {
