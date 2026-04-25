@@ -80,6 +80,13 @@ header {
     gap: 15px;
 }
 
+.controls span {
+    font-size: 1.3rem;
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+}
+
 .btn-qty {
     background: var(--secondary);
     border: none;
