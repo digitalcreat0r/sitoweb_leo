@@ -5,7 +5,11 @@
                 <p>
                     <strong>{{ site.company_name }}</strong><br>
                     Sede legale: {{ site.address }}<br>
-                    P.IVA: {{ site.p_iva }} | C.F.: {{ site.codice_fiscale }} | REA: {{ site.rea }}<br>
+                    <span class="legal-detail">P.IVA: {{ site.p_iva }}</span>
+                    <span class="legal-sep"> | </span>
+                    <span class="legal-detail">C.F.: {{ site.codice_fiscale }}</span>
+                    <span class="legal-sep"> | </span>
+                    <span class="legal-detail">REA: {{ site.rea }}</span><br>
                     Email: <a href="mailto:{{ site.email }}">{{ site.email }}</a>
                 </p>
             </div>

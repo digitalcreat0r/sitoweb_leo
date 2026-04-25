@@ -274,5 +274,13 @@ footer {
     }
     .legal-info {
         font-size: 0.95rem;
+        text-align: center;
+    }
+    .legal-detail {
+        display: block;
+        margin: 5px 0;
+    }
+    .legal-sep {
+        display: none;
     }
 }
