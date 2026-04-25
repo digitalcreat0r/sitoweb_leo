@@ -1,6 +1,6 @@
 let products = [];
 let cart = {};
-const LIMIT_HOME_PRODUCTS = 3;
+const LIMIT_HOME_PRODUCTS = window.innerWidth >= 768 ? 8 : 3;
 
 async function loadProducts() {
     try {
