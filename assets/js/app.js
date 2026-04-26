@@ -198,7 +198,14 @@ function showAddressStep() {
     document.getElementById('btn-proceed').style.display = 'none';
     document.getElementById('btn-modify').style.display = 'none';
     document.getElementById('wa-send-btn').style.display = 'block';
-    document.getElementById('delivery-address').focus();
+
+    const savedAddress = localStorage.getItem('deliveryAddress');
+    const addressInput = document.getElementById('delivery-address');
+    if (!addressInput.value && savedAddress) {
+        addressInput.value = savedAddress;
+    }
+
+    addressInput.focus();
 }
 
 function prepareWAMessage(event) {
@@ -208,6 +215,10 @@ function prepareWAMessage(event) {
         alert("Per favore, inserisci un indirizzo per la consegna.");
         return;
     }
+
+    // Salva l'indirizzo localmente per i prossimi ordini
+    localStorage.setItem('deliveryAddress', address);
+
     const finalMessage = `${currentOrderText}\n\n📍 *Indirizzo di consegna:*\n${address}`;
     const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
     document.getElementById('wa-send-btn').href = waLink;
