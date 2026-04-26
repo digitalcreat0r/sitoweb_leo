@@ -99,11 +99,11 @@ function initModal() {
                     </div>
                 </div>
                 <div id="address-step" style="display: none; margin-bottom: 15px;">
-                    <label class="address-label" for="delivery-address">Inserisci l'indirizzo di consegna:</label>
-                    <textarea id="delivery-address" class="address-input" rows="3" placeholder="Via, numero civico, città..."></textarea>
-                    <p style="font-size: 0.8rem; color: #666; margin-top: 5px; text-align: left; line-height: 1.2;">
-                        💡 L'indirizzo verrà salvato solo sul tuo browser per velocizzare i prossimi ordini.
-                    </p>
+                    <label class="address-label" for="delivery-address">Indirizzo di consegna:</label>
+                    <textarea id="delivery-address" class="address-input" rows="2" placeholder="Via, numero civico, città..."></textarea>
+                    
+                    <label class="address-label" for="order-notes" style="margin-top: 10px;">Note aggiuntive (opzionale):</label>
+                    <textarea id="order-notes" class="address-input" rows="2" placeholder="Citofono, piano, orario preferito..."></textarea>
                 </div>
                 <div class="modal-actions">
                     <div class="modal-row">
@@ -155,6 +155,7 @@ function executeResetCart() {
         if (qtyElement) qtyElement.innerText = '0';
     });
     document.getElementById('delivery-address').value = '';
+    document.getElementById('order-notes').value = '';
     updateTotal();
     closeConfirmModal();
     closeModal();
@@ -213,6 +214,7 @@ function showAddressStep() {
 
 function prepareWAMessage(event) {
     const address = document.getElementById('delivery-address').value.trim();
+    const notes = document.getElementById('order-notes').value.trim();
     if (!address) {
         event.preventDefault();
         showWarning("<span style='display: block; font-weight: bold; font-size: 1.3rem; margin-bottom: 10px; color: var(--dark);'>Indirizzo mancante</span>Inserisci l'indirizzo di consegna per procedere. Lo ricorderemo per i tuoi prossimi ordini!");
@@ -221,7 +223,12 @@ function prepareWAMessage(event) {
 
     localStorage.setItem('deliveryAddress', address);
 
-    const finalMessage = `${currentOrderText}\n\n📍 *Indirizzo di consegna:*\n${address}`;
+    let finalMessage = `${currentOrderText}\n\n📍 *Indirizzo di consegna:*\n${address}`;
+    
+    if (notes) {
+        finalMessage += `\n\n📝 *Note:* ${notes}`;
+    }
+
     const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
     
     // Forza l'apertura del link aggiornato per evitare che il browser usi un href vecchio
