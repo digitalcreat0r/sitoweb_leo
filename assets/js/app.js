@@ -92,16 +92,23 @@ function initModal() {
         <div id="order-modal" class="modal-overlay">
             <div class="modal-content">
                 <h2>Riepilogo Ordine</h2>
-                <div id="modal-order-details" class="order-summary-box"></div>
-                <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; text-align: center; color: var(--primary);">
-                    Totale: <span id="modal-order-total"></span>
+                <div id="summary-step">
+                    <div id="modal-order-details" class="order-summary-box"></div>
+                    <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; text-align: center; color: var(--primary);">
+                        Totale: <span id="modal-order-total"></span>
+                    </div>
+                </div>
+                <div id="address-step" style="display: none; margin-bottom: 15px;">
+                    <label class="address-label" for="delivery-address">Inserisci l'indirizzo di consegna:</label>
+                    <textarea id="delivery-address" class="address-input" rows="3" placeholder="Via, numero civico, città..."></textarea>
                 </div>
                 <div class="modal-actions">
                     <div class="modal-row">
                         <button class="btn-cancel" onclick="resetCart()">Annulla</button>
                         <button class="btn-cancel" onclick="closeModal()">Modifica</button>
                     </div>
-                    <a id="wa-send-btn" class="btn-send" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center;">Invia su WhatsApp</a>
+                    <button id="btn-proceed" class="btn-send" onclick="showAddressStep()" style="display: block; width: 100%;">Prosegui</button>
+                    <a id="wa-send-btn" class="btn-send" target="_blank" rel="noopener noreferrer" style="display: none; text-align: center;" onclick="prepareWAMessage(event)">Invia su WhatsApp</a>
                 </div>
             </div>
         </div>
@@ -123,6 +130,7 @@ function resetCart() {
         const qtyElement = document.getElementById(`qty-${p.id}`);
         if (qtyElement) qtyElement.innerText = '0';
     });
+    document.getElementById('delivery-address').value = '';
     updateTotal();
     closeModal();
 }
@@ -148,14 +156,37 @@ function confirmAndSend() {
 
     currentOrderText = `Ciao! Vorrei prenotare questi prodotti:\n\n${orderList}\n*TOTALE: ${total.toFixed(2)}€*`;
     
-    // Aggiorniamo dinamicamente il link del pulsante WhatsApp con il testo dell'ordine appena generato
-    const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(currentOrderText)}`;
-    document.getElementById('wa-send-btn').href = waLink;
-    
     document.getElementById('modal-order-details').innerText = orderList;
     document.getElementById('modal-order-total').innerText = `${total.toFixed(2)}€`;
+    
+    // Reset vista modale allo step 1
+    document.getElementById('summary-step').style.display = 'block';
+    document.getElementById('address-step').style.display = 'none';
+    document.getElementById('btn-proceed').style.display = 'block';
+    document.getElementById('wa-send-btn').style.display = 'none';
+
     document.getElementById('order-modal').style.display = 'flex';
     document.body.style.overflow = 'hidden'; // Blocca lo scroll dello sfondo
+}
+
+function showAddressStep() {
+    document.getElementById('summary-step').style.display = 'none';
+    document.getElementById('address-step').style.display = 'block';
+    document.getElementById('btn-proceed').style.display = 'none';
+    document.getElementById('wa-send-btn').style.display = 'block';
+    document.getElementById('delivery-address').focus();
+}
+
+function prepareWAMessage(event) {
+    const address = document.getElementById('delivery-address').value.trim();
+    if (!address) {
+        event.preventDefault();
+        alert("Per favore, inserisci un indirizzo per la consegna.");
+        return;
+    }
+    const finalMessage = `${currentOrderText}\n\n📍 *Indirizzo di consegna:*\n${address}`;
+    const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
+    document.getElementById('wa-send-btn').href = waLink;
 }
 
 function closeModal() {

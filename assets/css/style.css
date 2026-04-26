@@ -343,6 +343,26 @@ footer {
     padding-bottom: 10px;
 }
 
+.address-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--dark);
+    text-align: left;
+}
+
+.address-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
 .order-summary-box {
     background: #fdfdfd;
     padding: 15px;
