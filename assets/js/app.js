@@ -2,6 +2,7 @@ let products = [];
 let cart = {};
 let currentOrderText = "";
 let initialLimit = 0;
+let isExpanded = false; // Traccia se l'utente ha visualizzato tutto
 
 function getGridColumns() {
     const container = document.getElementById('product-list');
@@ -36,22 +37,44 @@ async function loadProducts() {
             if (p.available) products.push(p);
         });
 
-        const cols = getGridColumns();
-        
-        initialLimit = (cols === 1) ? 3 : cols * 2;
-
-        const initialProducts = products.slice(0, initialLimit);
-        container.innerHTML = initialProducts.map(p => renderProductCard(p)).join('');
-
-        if (products.length > initialLimit) {
-            document.getElementById('btn-show-all').style.display = 'block';
-        }
+        renderProductGrid();
 
     } catch (error) {
         console.error("Errore caricamento:", error);
         document.getElementById('product-list').innerHTML = "Errore nel caricamento dei prodotti. Riprova più tardi.";
     }
 }
+
+function renderProductGrid() {
+    // Se abbiamo già mostrato tutto, non facciamo nulla al ridimensionamento
+    if (isExpanded || products.length === 0) return;
+
+    const container = document.getElementById('product-list');
+    const cols = getGridColumns();
+    
+    // 1 colonna (mobile verticale) -> 3 prodotti
+    // Più colonne -> riempiamo 2 righe complete
+    initialLimit = (cols === 1) ? 3 : cols * 2;
+
+    const initialProducts = products.slice(0, initialLimit);
+    container.innerHTML = initialProducts.map(p => renderProductCard(p)).join('');
+
+    const btnShowAll = document.getElementById('btn-show-all');
+    if (btnShowAll) {
+        btnShowAll.style.display = (products.length > initialLimit) ? 'block' : 'none';
+    }
+}
+
+function showAllProducts() {
+    isExpanded = true;
+    const container = document.getElementById('product-list');
+    const remainingProducts = products.slice(initialLimit);
+    
+    container.insertAdjacentHTML('beforeend', remainingProducts.map(p => renderProductCard(p)).join(''));
+    
+    document.getElementById('btn-show-all').style.display = 'none';
+}
+
 
 function renderProductCard(p) {
     const qty = cart[p.id] || 0;
@@ -69,14 +92,6 @@ function renderProductCard(p) {
     `;
 }
 
-function showAllProducts() {
-    const container = document.getElementById('product-list');
-    const remainingProducts = products.slice(initialLimit);
-    
-    container.insertAdjacentHTML('beforeend', remainingProducts.map(p => renderProductCard(p)).join(''));
-    
-    document.getElementById('btn-show-all').style.display = 'none';
-}
 
 function changeQty(id, delta) {
     if (!cart[id]) cart[id] = 0;
@@ -278,4 +293,11 @@ function closeWarningModal() {
 document.addEventListener("DOMContentLoaded", () => {
     initModal();
     loadProducts();
+});
+
+// Gestisce la rotazione del telefono o il ridimensionamento finestra PC
+window.addEventListener('resize', () => {
+    // Usiamo un piccolo timeout per evitare troppi calcoli durante il ridimensionamento fluido su PC
+    clearTimeout(window.resizeTimer);
+    window.resizeTimer = setTimeout(renderProductGrid, 100);
 });
