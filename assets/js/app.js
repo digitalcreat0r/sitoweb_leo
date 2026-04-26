@@ -52,9 +52,20 @@ function renderProductGrid() {
     const container = document.getElementById('product-list');
     const cols = getGridColumns();
     
-    // 1 colonna (mobile verticale) -> 3 prodotti
-    // Più colonne -> riempiamo 2 righe complete
-    initialLimit = (cols === 1) ? 3 : cols * 2;
+    if (cols === 1) {
+        initialLimit = 3;
+    } else {
+       
+        const fullRowsPossible = Math.floor(products.length / cols);
+        
+        if (fullRowsPossible >= 2) {
+            initialLimit = cols * 2;
+        } else if (fullRowsPossible === 1) {
+            initialLimit = cols;
+        } else {
+            initialLimit = products.length;
+        }
+    }
 
     const initialProducts = products.slice(0, initialLimit);
     container.innerHTML = initialProducts.map(p => renderProductCard(p)).join('');
