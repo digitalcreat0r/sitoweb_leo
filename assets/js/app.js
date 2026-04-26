@@ -1,5 +1,6 @@
 let products = [];
 let cart = {};
+let currentOrderText = "";
 const LIMIT_HOME_PRODUCTS = window.innerWidth >= 768 ? 8 : 3;
 
 async function loadProducts() {
@@ -86,6 +87,25 @@ function updateTotal() {
     document.getElementById('total-display').innerText = `Totale: ${total.toFixed(2)} €`;
 }
 
+function initModal() {
+    const modalHtml = `
+        <div id="order-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Riepilogo Ordine</h2>
+                <div id="modal-order-details" class="order-summary-box"></div>
+                <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; text-align: center; color: var(--primary);">
+                    Totale: <span id="modal-order-total"></span>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-send" onclick="sendWhatsApp()">Invia su WhatsApp</button>
+                    <button class="btn-cancel" onclick="closeModal()">Modifica Ordine</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
 function confirmAndSend() {
     let orderList = "";
     let total = 0;
@@ -105,17 +125,24 @@ function confirmAndSend() {
         return;
     }
 
-    const summary = `RIEPILOGO ORDINE:\n\n${orderList}\nTOTALE: ${total.toFixed(2)}€\n\nVuoi confermare e inviare l'ordine su WhatsApp?`;
+    currentOrderText = `Ciao! Vorrei prenotare questi prodotti:\n\n${orderList}\n*TOTALE: ${total.toFixed(2)}€*`;
+    
+    document.getElementById('modal-order-details').innerText = orderList;
+    document.getElementById('modal-order-total').innerText = `${total.toFixed(2)}€`;
+    document.getElementById('order-modal').style.display = 'flex';
+}
 
-    if (confirm(summary)) {
-        const orderText = `Ciao! Vorrei prenotare questi prodotti:\n\n${orderList}\n*TOTALE: ${total.toFixed(2)}€*`;
-        // Usiamo AppConfig.phoneNumber passata da Jekyll
-        const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(orderText)}`;
-        window.location.href = waLink;
-    }
+function closeModal() {
+    document.getElementById('order-modal').style.display = 'none';
+}
+
+function sendWhatsApp() {
+    const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(currentOrderText)}`;
+    window.location.href = waLink;
 }
 
 // Inizializza l'app caricando i prodotti
 document.addEventListener("DOMContentLoaded", () => {
+    initModal();
     loadProducts();
 });

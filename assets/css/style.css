@@ -303,3 +303,67 @@ footer {
         display: none;
     }
 }
+
+/* Modal Riepilogo Ordine */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 15px;
+    backdrop-filter: blur(3px);
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+.modal-content h2 {
+    margin: 0 0 15px 0;
+    color: var(--dark);
+    font-size: 1.5rem;
+    text-align: center;
+    border-bottom: 2px solid var(--secondary);
+    padding-bottom: 10px;
+}
+
+.order-summary-box {
+    background: #fdfdfd;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.4;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid #ccc;
+    color: #888;
+    padding: 12px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+}
