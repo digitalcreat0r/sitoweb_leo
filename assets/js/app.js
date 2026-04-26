@@ -101,7 +101,7 @@ function initModal() {
                         <button class="btn-cancel" onclick="resetCart()">Annulla</button>
                         <button class="btn-cancel" onclick="closeModal()">Modifica</button>
                     </div>
-                    <button class="btn-send" onclick="sendWhatsApp()">Invia su WhatsApp</button>
+                    <a id="wa-send-btn" class="btn-send" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center;">Invia su WhatsApp</a>
                 </div>
             </div>
         </div>
@@ -148,6 +148,10 @@ function confirmAndSend() {
 
     currentOrderText = `Ciao! Vorrei prenotare questi prodotti:\n\n${orderList}\n*TOTALE: ${total.toFixed(2)}€*`;
     
+    // Aggiorniamo dinamicamente il link del pulsante WhatsApp con il testo dell'ordine appena generato
+    const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(currentOrderText)}`;
+    document.getElementById('wa-send-btn').href = waLink;
+    
     document.getElementById('modal-order-details').innerText = orderList;
     document.getElementById('modal-order-total').innerText = `${total.toFixed(2)}€`;
     document.getElementById('order-modal').style.display = 'flex';
@@ -168,11 +172,6 @@ function showWarning(message) {
 function closeWarningModal() {
     document.getElementById('warning-modal').style.display = 'none';
     document.body.style.overflow = '';
-}
-
-function sendWhatsApp() {
-    const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(currentOrderText)}`;
-    window.open(waLink, '_blank');
 }
 
 // Inizializza l'app caricando i prodotti
