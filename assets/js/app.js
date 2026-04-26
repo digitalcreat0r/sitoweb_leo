@@ -103,7 +103,7 @@ function initModal() {
                     <textarea id="delivery-address" class="address-input" rows="2" placeholder="Via, numero civico, città..."></textarea>
                     
                     <label class="address-label" for="order-notes" style="margin-top: 10px;">Note aggiuntive (opzionale):</label>
-                    <textarea id="order-notes" class="address-input" rows="2" placeholder="Citofono, piano, orario preferito..."></textarea>
+                    <textarea id="order-notes" class="address-input" rows="2"></textarea>
                 </div>
                 <div class="modal-actions">
                     <div class="modal-row">
