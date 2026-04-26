@@ -105,7 +105,7 @@ function initModal() {
                 <div class="modal-actions">
                     <div class="modal-row">
                         <button class="btn-cancel" onclick="resetCart()">Annulla</button>
-                        <button class="btn-cancel" onclick="closeModal()">Modifica</button>
+                        <button id="btn-modify" class="btn-cancel" onclick="closeModal()">Modifica</button>
                     </div>
                     <button id="btn-proceed" class="btn-send" onclick="showAddressStep()" style="display: block; width: 100%;">Prosegui</button>
                     <a id="wa-send-btn" class="btn-send" target="_blank" rel="noopener noreferrer" style="display: none; text-align: center;" onclick="prepareWAMessage(event)">Invia su WhatsApp</a>
@@ -163,6 +163,7 @@ function confirmAndSend() {
     document.getElementById('summary-step').style.display = 'block';
     document.getElementById('address-step').style.display = 'none';
     document.getElementById('btn-proceed').style.display = 'block';
+    document.getElementById('btn-modify').style.display = 'block';
     document.getElementById('wa-send-btn').style.display = 'none';
 
     document.getElementById('order-modal').style.display = 'flex';
@@ -173,6 +174,7 @@ function showAddressStep() {
     document.getElementById('summary-step').style.display = 'none';
     document.getElementById('address-step').style.display = 'block';
     document.getElementById('btn-proceed').style.display = 'none';
+    document.getElementById('btn-modify').style.display = 'none';
     document.getElementById('wa-send-btn').style.display = 'block';
     document.getElementById('delivery-address').focus();
 }
