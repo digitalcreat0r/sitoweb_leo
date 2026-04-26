@@ -374,3 +374,13 @@ footer {
     font-weight: bold;
     cursor: pointer;
 }
+
+.modal-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.modal-row .btn-cancel {
+    flex: 1;
+}

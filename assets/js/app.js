@@ -98,7 +98,10 @@ function initModal() {
                 </div>
                 <div class="modal-actions">
                     <button class="btn-send" onclick="sendWhatsApp()">Invia su WhatsApp</button>
-                    <button class="btn-cancel" onclick="closeModal()">Modifica Ordine</button>
+                    <div class="modal-row">
+                        <button class="btn-cancel" onclick="resetCart()">Annulla</button>
+                        <button class="btn-cancel" onclick="closeModal()">Modifica</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,6 +115,16 @@ function initModal() {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function resetCart() {
+    cart = {};
+    products.forEach(p => {
+        const qtyElement = document.getElementById(`qty-${p.id}`);
+        if (qtyElement) qtyElement.innerText = '0';
+    });
+    updateTotal();
+    closeModal();
 }
 
 function confirmAndSend() {
