@@ -1,7 +1,14 @@
 let products = [];
 let cart = {};
 let currentOrderText = "";
-const LIMIT_HOME_PRODUCTS = window.innerWidth >= 768 ? 8 : 3;
+let initialLimit = 0;
+
+function getGridColumns() {
+    const container = document.getElementById('product-list');
+    const width = container ? container.offsetWidth : window.innerWidth;
+    const cols = Math.floor((width + 15) / (160 + 15));
+    return Math.max(1, cols);
+}
 
 async function loadProducts() {
     try {
@@ -29,12 +36,14 @@ async function loadProducts() {
             if (p.available) products.push(p);
         });
 
-        // 2. Renderizza solo il primo blocco di prodotti
-        const initialProducts = products.slice(0, LIMIT_HOME_PRODUCTS);
+        const cols = getGridColumns();
+        
+        initialLimit = (cols === 1) ? 3 : cols * 2;
+
+        const initialProducts = products.slice(0, initialLimit);
         container.innerHTML = initialProducts.map(p => renderProductCard(p)).join('');
 
-        // Mostra il pulsante "Mostra tutti" se ci sono più prodotti del limite
-        if (products.length > LIMIT_HOME_PRODUCTS) {
+        if (products.length > initialLimit) {
             document.getElementById('btn-show-all').style.display = 'block';
         }
 
@@ -45,6 +54,7 @@ async function loadProducts() {
 }
 
 function renderProductCard(p) {
+    const qty = cart[p.id] || 0;
     return `
         <div class="card">
             <img src="${p.img}" alt="${p.name}" loading="lazy">
@@ -52,7 +62,7 @@ function renderProductCard(p) {
             <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
             <div class="controls">
                 <button class="btn-qty" onclick="changeQty(${p.id}, -1)">-</button>
-                <span id="qty-${p.id}">0</span>
+                <span id="qty-${p.id}">${qty}</span>
                 <button class="btn-qty" onclick="changeQty(${p.id}, 1)">+</button>
             </div>
         </div>
@@ -61,9 +71,8 @@ function renderProductCard(p) {
 
 function showAllProducts() {
     const container = document.getElementById('product-list');
-    const remainingProducts = products.slice(LIMIT_HOME_PRODUCTS);
+    const remainingProducts = products.slice(initialLimit);
     
-    // Aggiunge al DOM solo i prodotti mancanti
     container.insertAdjacentHTML('beforeend', remainingProducts.map(p => renderProductCard(p)).join(''));
     
     document.getElementById('btn-show-all').style.display = 'none';
