@@ -39,4 +39,4 @@ I dati personali scambiati via WhatsApp saranno conservati per il tempo strettam
 Ai sensi del GDPR (Regolamento UE 2016/679), hai il diritto di accedere ai tuoi dati, chiederne la rettifica, la cancellazione ("diritto all'oblio") o la limitazione del trattamento scrivendo a: **{{ site.email }}**.
 
 ### 8. Cookie
-Per informazioni sull'uso dei cookie e degli strumenti di tracciamento, consulta la nostra [Cookie Policy](/cookie-policy).
+Per informazioni sull'uso dei cookie e degli strumenti di tracciamento, consulta la nostra Cookie Policy.

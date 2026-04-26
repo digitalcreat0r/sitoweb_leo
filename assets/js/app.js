@@ -45,7 +45,6 @@ async function loadProducts() {
 }
 
 function renderProductCard(p) {
-    // Nota: loading="lazy" ottimizza il caricamento delle immagini
     return `
         <div class="card">
             <img src="${p.img}" alt="${p.name}" loading="lazy">
@@ -138,7 +137,7 @@ function initModal() {
         </div>
         <div id="cookie-banner" class="cookie-banner">
             <p>Questo sito utilizza solo cookie tecnici e strumenti funzionali per gestire l'ordine. 
-               Utilizzando il sito, accetti la nostra <a href="/cookie-policy">Cookie Policy</a>.</p>
+               Utilizzando il sito, accetti la nostra <a href="cookie-policy.html">Cookie Policy</a>.</p>
             <button class="btn-send" style="padding: 10px; font-size: 0.9rem;" onclick="acceptCookies()">Ho capito</button>
         </div>
     `;
