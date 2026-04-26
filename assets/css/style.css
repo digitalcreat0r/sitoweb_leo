@@ -404,3 +404,33 @@ footer {
 .modal-row .btn-cancel {
     flex: 1;
 }
+
+/* Cookie Banner */
+.cookie-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 3000;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    border: 1px solid var(--secondary);
+}
+
+.cookie-banner p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.4;
+}
+
+.cookie-banner a {
+    color: var(--primary);
+    text-decoration: underline;
+}

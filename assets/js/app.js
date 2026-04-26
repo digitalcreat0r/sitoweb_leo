@@ -136,8 +136,22 @@ function initModal() {
                 </div>
             </div>
         </div>
+        <div id="cookie-banner" class="cookie-banner">
+            <p>Questo sito utilizza solo cookie tecnici e strumenti funzionali per gestire l'ordine. 
+               Utilizzando il sito, accetti la nostra <a href="/cookie-policy">Cookie Policy</a>.</p>
+            <button class="btn-send" style="padding: 10px; font-size: 0.9rem;" onclick="acceptCookies()">Ho capito</button>
+        </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    if (!localStorage.getItem('cookie-consent')) {
+        document.getElementById('cookie-banner').style.display = 'flex';
+    }
+}
+
+function acceptCookies() {
+    localStorage.setItem('cookie-consent', 'true');
+    document.getElementById('cookie-banner').style.display = 'none';
 }
 
 function resetCart() {
