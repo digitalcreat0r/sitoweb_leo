@@ -26,4 +26,6 @@ Ai sensi dell'art. 59 del Codice del Consumo (D.Lgs. 206/2005), il diritto di re
 **{{ site.company_name }}** non è responsabile per eventuali errori tecnici nel caricamento dei dati (prezzi o disponibilità) derivanti da problemi di connessione con il database esterno (Google Sheets) o malfunzionamenti della piattaforma WhatsApp.
 
 ### 6. Informazioni Aziendali
-**{{ site.company_name }}** P.IVA: **{{ site.p_iva }}** | C.F.: **{{ site.codice_fiscale }}**.
+**{{ site.company_name }}**<br>
+P.IVA: **{{ site.p_iva }}**<br>
+C.F.: **{{ site.codice_fiscale }}**
