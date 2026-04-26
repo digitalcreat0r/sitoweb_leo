@@ -223,10 +223,10 @@ function prepareWAMessage(event) {
 
     localStorage.setItem('deliveryAddress', address);
 
-    let finalMessage = `${currentOrderText}\n\n📍 *Indirizzo di consegna:*\n${address}`;
+    let finalMessage = `${currentOrderText}\n\n*Indirizzo di consegna:*\n${address}`;
     
     if (notes) {
-        finalMessage += `\n\n📝 *Note:* ${notes}`;
+        finalMessage += `\n\n*Note:* ${notes}`;
     }
 
     const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
