@@ -102,6 +102,15 @@ function initModal() {
                 </div>
             </div>
         </div>
+        <div id="warning-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2 id="warning-title">Attenzione</h2>
+                <div id="warning-message" class="order-summary-box" style="text-align: center; border: none; font-size: 1.1rem; min-height: auto;"></div>
+                <div class="modal-actions">
+                    <button class="btn-send" style="background-color: var(--primary);" onclick="closeWarningModal()">Ho capito</button>
+                </div>
+            </div>
+        </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
@@ -121,7 +130,7 @@ function confirmAndSend() {
     });
 
     if (!hasItems) {
-        alert("Il carrello è vuoto! Seleziona almeno un prodotto.");
+        showWarning("Il tuo carrello è vuoto! Seleziona almeno un prodotto prima di procedere con la prenotazione.");
         return;
     }
 
@@ -136,6 +145,17 @@ function confirmAndSend() {
 function closeModal() {
     document.getElementById('order-modal').style.display = 'none';
     document.body.style.overflow = ''; // Ripristina lo scroll
+}
+
+function showWarning(message) {
+    document.getElementById('warning-message').innerText = message;
+    document.getElementById('warning-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeWarningModal() {
+    document.getElementById('warning-modal').style.display = 'none';
+    document.body.style.overflow = '';
 }
 
 function sendWhatsApp() {
