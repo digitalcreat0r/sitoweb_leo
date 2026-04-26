@@ -217,7 +217,7 @@ function prepareWAMessage(event) {
     const notes = document.getElementById('order-notes').value.trim();
     if (!address) {
         event.preventDefault();
-        showWarning("<span style='display: block; font-weight: bold; font-size: 1.3rem; margin-bottom: 10px; color: var(--dark);'>Indirizzo mancante</span>Inserisci l'indirizzo di consegna per procedere. Lo ricorderemo per i tuoi prossimi ordini!");
+        showWarning("<span style='display: block; font-weight: bold; font-size: 1.3rem; margin-bottom: 10px; color: var(--dark);'>Indirizzo mancante</span>Inserisci l'indirizzo di consegna per procedere. Il tuo browser lo dovrebbe ricordare per i tuoi prossimi ordini!");
         return;
     }
 
