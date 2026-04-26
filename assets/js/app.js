@@ -10,46 +10,30 @@ async function loadProducts() {
 
         const container = document.getElementById('product-list');
         container.innerHTML = '';
-        
-        let visibleCount = 0;
 
+        // 1. Elabora tutti i dati e popola l'array products
         rows.forEach((row, index) => {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (cols.length < 3) return;
 
             const p = {
                 id: index,
-                name: cols[0].replace(/"/g, '').trim(),
+                name: (cols[0] || "").replace(/"/g, '').trim(),
                 price: parseFloat(cols[2]),
-                unit: cols[3].trim(),
-                available: cols[4].trim().toUpperCase() === 'SÌ',
+                unit: (cols[3] || "").trim(),
+                available: (cols[4] || "").trim().toUpperCase() === 'SÌ',
                 img: cols[5] ? cols[5].trim() : 'https://via.placeholder.com/150?text=Verdura'
             };
 
-            if (p.available) {
-                products.push(p);
-                visibleCount++;
-                
-                // Se superiamo il limite, nascondiamo la card aggiungendo 'display: none'
-                const isHidden = visibleCount > LIMIT_HOME_PRODUCTS ? 'style="display:none;" class="card extra-product"' : 'class="card"';
-
-                container.innerHTML += `
-                    <div ${isHidden}>
-                        <img src="${p.img}" alt="${p.name}">
-                        <h3>${p.name}</h3>
-                        <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
-                        <div class="controls">
-                            <button class="btn-qty" onclick="changeQty(${p.id}, -1)">-</button>
-                            <span id="qty-${p.id}">0</span>
-                            <button class="btn-qty" onclick="changeQty(${p.id}, 1)">+</button>
-                        </div>
-                    </div>
-                `;
-            }
+            if (p.available) products.push(p);
         });
 
+        // 2. Renderizza solo il primo blocco di prodotti
+        const initialProducts = products.slice(0, LIMIT_HOME_PRODUCTS);
+        container.innerHTML = initialProducts.map(p => renderProductCard(p)).join('');
+
         // Mostra il pulsante "Mostra tutti" se ci sono più prodotti del limite
-        if (visibleCount > LIMIT_HOME_PRODUCTS) {
+        if (products.length > LIMIT_HOME_PRODUCTS) {
             document.getElementById('btn-show-all').style.display = 'block';
         }
 
@@ -59,12 +43,29 @@ async function loadProducts() {
     }
 }
 
+function renderProductCard(p) {
+    // Nota: loading="lazy" ottimizza il caricamento delle immagini
+    return `
+        <div class="card">
+            <img src="${p.img}" alt="${p.name}" loading="lazy">
+            <h3>${p.name}</h3>
+            <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
+            <div class="controls">
+                <button class="btn-qty" onclick="changeQty(${p.id}, -1)">-</button>
+                <span id="qty-${p.id}">0</span>
+                <button class="btn-qty" onclick="changeQty(${p.id}, 1)">+</button>
+            </div>
+        </div>
+    `;
+}
+
 function showAllProducts() {
-    // Trova tutti i prodotti nascosti e li mostra
-    document.querySelectorAll('.extra-product').forEach(el => {
-        el.style.display = 'flex'; // Usiamo flex perché la tua classe .card usa flexbox
-    });
-    // Nasconde il pulsante dopo averci cliccato
+    const container = document.getElementById('product-list');
+    const remainingProducts = products.slice(LIMIT_HOME_PRODUCTS);
+    
+    // Aggiunge al DOM solo i prodotti mancanti
+    container.insertAdjacentHTML('beforeend', remainingProducts.map(p => renderProductCard(p)).join(''));
+    
     document.getElementById('btn-show-all').style.display = 'none';
 }
 
