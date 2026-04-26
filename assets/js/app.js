@@ -112,6 +112,19 @@ function initModal() {
                 </div>
             </div>
         </div>
+        <div id="confirm-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div style="text-align: center; font-size: 1.1rem; padding: 20px 0; color: #444; line-height: 1.5;">
+                    Sei sicuro di voler annullare?<br><strong>Il carrello verrà svuotato.</strong>
+                </div>
+                <div class="modal-actions">
+                    <div class="modal-row">
+                        <button class="btn-cancel" onclick="closeConfirmModal()">No, rimani</button>
+                        <button class="btn-send" style="background-color: #d62828;" onclick="executeResetCart()">Sì, svuota</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="warning-modal" class="modal-overlay">
             <div class="modal-content">
                 <div id="warning-message" style="text-align: center; font-size: 1.1rem; padding: 20px 0; color: #444; line-height: 1.5;"></div>
@@ -125,6 +138,14 @@ function initModal() {
 }
 
 function resetCart() {
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirm-modal').style.display = 'none';
+}
+
+function executeResetCart() {
     cart = {};
     products.forEach(p => {
         const qtyElement = document.getElementById(`qty-${p.id}`);
@@ -132,6 +153,7 @@ function resetCart() {
     });
     document.getElementById('delivery-address').value = '';
     updateTotal();
+    closeConfirmModal();
     closeModal();
 }
 
