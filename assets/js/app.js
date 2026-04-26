@@ -184,7 +184,6 @@ function confirmAndSend() {
     document.getElementById('modal-order-details').innerText = orderList;
     document.getElementById('modal-order-total').innerText = `${total.toFixed(2)}€`;
     
-    // Reset vista modale allo step 1
     document.getElementById('summary-step').style.display = 'block';
     document.getElementById('address-step').style.display = 'none';
     document.getElementById('btn-proceed').style.display = 'block';
@@ -202,10 +201,11 @@ function showAddressStep() {
     document.getElementById('btn-modify').style.display = 'none';
     document.getElementById('wa-send-btn').style.display = 'block';
 
-    const savedAddress = localStorage.getItem('deliveryAddress');
     const addressInput = document.getElementById('delivery-address');
-    if (!addressInput.value && savedAddress) {
-        addressInput.value = savedAddress;
+    
+    if (!addressInput.value) {
+        const savedAddress = localStorage.getItem('deliveryAddress');
+        if (savedAddress) addressInput.value = savedAddress;
     }
 
     addressInput.focus();
@@ -219,12 +219,14 @@ function prepareWAMessage(event) {
         return;
     }
 
-    // Salva l'indirizzo localmente per i prossimi ordini
     localStorage.setItem('deliveryAddress', address);
 
     const finalMessage = `${currentOrderText}\n\n📍 *Indirizzo di consegna:*\n${address}`;
     const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
-    document.getElementById('wa-send-btn').href = waLink;
+    
+    // Forza l'apertura del link aggiornato per evitare che il browser usi un href vecchio
+    event.preventDefault();
+    window.open(waLink, '_blank');
 }
 
 function closeModal() {
@@ -243,7 +245,6 @@ function closeWarningModal() {
     document.body.style.overflow = '';
 }
 
-// Inizializza l'app caricando i prodotti
 document.addEventListener("DOMContentLoaded", () => {
     initModal();
     loadProducts();
