@@ -129,7 +129,7 @@ function confirmAndSend() {
     });
 
     if (!hasItems) {
-        showWarning("Il tuo carrello è vuoto! Seleziona almeno un prodotto prima di procedere con la prenotazione.");
+        showWarning("Il tuo carrello è vuoto!\n\nSeleziona almeno un prodotto prima di procedere con la prenotazione.");
         return;
     }
 
