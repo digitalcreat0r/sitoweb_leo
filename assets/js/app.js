@@ -111,7 +111,7 @@ function confirmAndSend() {
         const orderText = `Ciao! Vorrei prenotare questi prodotti:\n\n${orderList}\n*TOTALE: ${total.toFixed(2)}€*`;
         // Usiamo AppConfig.phoneNumber passata da Jekyll
         const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(orderText)}`;
-        window.open(waLink, '_blank');
+        window.location.href = waLink;
     }
 }
 
