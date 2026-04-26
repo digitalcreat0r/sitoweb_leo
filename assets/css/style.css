@@ -327,14 +327,15 @@ footer {
     border-radius: 20px;
     width: 92%;
     max-width: 380px;
-    max-height: 90%;
-    overflow-y: auto;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 15px 35px rgba(0,0,0,0.3);
     box-sizing: border-box;
 }
 
 .modal-content h2 {
-    margin: 0 0 15px 0;
+    margin: 0 0 10px 0;
     color: var(--dark);
     font-size: 1.5rem;
     text-align: center;
@@ -347,12 +348,15 @@ footer {
     padding: 15px;
     border: 1px solid #eee;
     border-radius: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-size: 1rem;
     color: #444;
     line-height: 1.4;
+    overflow-y: auto;
+    flex-grow: 1;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-actions {

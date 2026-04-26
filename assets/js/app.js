@@ -130,10 +130,12 @@ function confirmAndSend() {
     document.getElementById('modal-order-details').innerText = orderList;
     document.getElementById('modal-order-total').innerText = `${total.toFixed(2)}€`;
     document.getElementById('order-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Blocca lo scroll dello sfondo
 }
 
 function closeModal() {
     document.getElementById('order-modal').style.display = 'none';
+    document.body.style.overflow = ''; // Ripristina lo scroll
 }
 
 function sendWhatsApp() {
