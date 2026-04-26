@@ -193,7 +193,7 @@ function confirmAndSend() {
         return;
     }
 
-    currentOrderText = `Ciao! Vorrei prenotare questi prodotti:\n\n${orderList}\n*TOTALE: ${total.toFixed(2)}€*`;
+    currentOrderText = `Ciao! Vorrei prenotare questi prodotti:\n\n${orderList.trim()}\n\n*TOTALE: ${total.toFixed(2)}€*`;
     
     document.getElementById('modal-order-details').innerText = orderList;
     document.getElementById('modal-order-total').innerText = `${total.toFixed(2)}€`;
@@ -236,10 +236,10 @@ function prepareWAMessage(event) {
 
     localStorage.setItem('deliveryAddress', address);
 
-    let finalMessage = `${currentOrderText}\n\n*Indirizzo di consegna:*\n${address}`;
+    let finalMessage = `${currentOrderText.trim()}\n\n*Indirizzo di consegna:*\n${address}`;
     
     if (notes) {
-        finalMessage += `\n\n*Note:* ${notes}`;
+        finalMessage += `\n\n*Note:*\n${notes}`;
     }
 
     const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
