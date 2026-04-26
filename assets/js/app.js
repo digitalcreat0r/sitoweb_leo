@@ -129,7 +129,7 @@ function confirmAndSend() {
     });
 
     if (!hasItems) {
-        showWarning("Il tuo carrello è vuoto!\n\nSeleziona almeno un prodotto prima di procedere con la prenotazione.");
+        showWarning("<span style='display: block; font-weight: bold; font-size: 1.3rem; margin-bottom: 10px; color: var(--dark);'>Il tuo carrello è vuoto!</span>Seleziona almeno un prodotto prima di procedere con la prenotazione.");
         return;
     }
 
@@ -147,7 +147,7 @@ function closeModal() {
 }
 
 function showWarning(message) {
-    document.getElementById('warning-message').innerText = message;
+    document.getElementById('warning-message').innerHTML = message;
     document.getElementById('warning-modal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
