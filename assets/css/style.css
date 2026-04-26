@@ -316,19 +316,21 @@ footer {
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    padding: 15px;
+    padding: 10px;
     backdrop-filter: blur(3px);
+    box-sizing: border-box;
 }
 
 .modal-content {
     background: white;
-    padding: 25px;
+    padding: 20px;
     border-radius: 20px;
-    width: 100%;
-    max-width: 400px;
-    max-height: 85vh;
+    width: 92%;
+    max-width: 380px;
+    max-height: 90%;
     overflow-y: auto;
     box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    box-sizing: border-box;
 }
 
 .modal-content h2 {
@@ -347,6 +349,7 @@ footer {
     border-radius: 10px;
     margin-bottom: 20px;
     white-space: pre-wrap;
+    word-wrap: break-word;
     font-size: 1rem;
     color: #444;
     line-height: 1.4;
