@@ -269,6 +269,21 @@ footer {
     font-size: 0.95rem;
 }
 
+.footer-nav .home-link {
+    color: var(--primary);
+    font-weight: bold;
+    border: 1px solid var(--primary);
+    padding: 5px 15px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.footer-nav .home-link:hover {
+    background-color: var(--primary);
+    color: white;
+    text-decoration: none;
+}
+
 @media (hover: hover) {
     .footer-nav a:hover {
         color: var(--primary);
@@ -290,6 +305,11 @@ footer {
         display: block;
         margin: 15px 0;
         font-size: 1rem;
+    }
+    .footer-nav .home-link {
+        display: inline-block; /* Evita che il bottone occupi tutta la larghezza su mobile */
+        margin-bottom: 20px;
+        padding: 8px 20px;
     }
     .legal-info {
         font-size: 0.95rem;
