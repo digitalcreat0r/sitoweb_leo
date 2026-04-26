@@ -104,10 +104,9 @@ function initModal() {
         </div>
         <div id="warning-modal" class="modal-overlay">
             <div class="modal-content">
-                <h2 id="warning-title">Attenzione</h2>
                 <div id="warning-message" class="order-summary-box" style="text-align: center; border: none; font-size: 1.1rem; min-height: auto;"></div>
                 <div class="modal-actions">
-                    <button class="btn-send" style="background-color: var(--primary);" onclick="closeWarningModal()">Ho capito</button>
+                    <button class="btn-send" style="background-color: var(--primary);" onclick="closeWarningModal()">OK</button>
                 </div>
             </div>
         </div>
