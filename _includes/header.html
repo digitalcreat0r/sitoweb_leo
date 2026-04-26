@@ -1,4 +1,6 @@
 <header>
-    <img src="{{ '/assets/images/logo.png' | relative_url }}" alt="Logo {{ site.title }}" class="logo">
-    <h1>{{ site.title }}</h1>
+    <a href="{{ '/' | relative_url }}" class="logo-link">
+        <img src="{{ '/assets/images/logo.png' | relative_url }}" alt="Logo {{ site.title }}" class="logo">
+        <h1>{{ site.title }}</h1>
+    </a>
 </header>
