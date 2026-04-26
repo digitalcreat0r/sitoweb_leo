@@ -231,9 +231,10 @@ function prepareWAMessage(event) {
 
     const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
     
-    // Forza l'apertura del link aggiornato per evitare che il browser usi un href vecchio
     event.preventDefault();
     window.open(waLink, '_blank');
+
+    executeResetCart();
 }
 
 function closeModal() {
