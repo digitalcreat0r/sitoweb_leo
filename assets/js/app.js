@@ -172,7 +172,7 @@ function closeWarningModal() {
 
 function sendWhatsApp() {
     const waLink = `https://wa.me/${AppConfig.phoneNumber}?text=${encodeURIComponent(currentOrderText)}`;
-    window.location.href = waLink;
+    window.open(waLink, '_blank');
 }
 
 // Inizializza l'app caricando i prodotti
