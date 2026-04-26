@@ -5,7 +5,7 @@ title: Condizioni di Vendita
 
 # Termini e Condizioni di Vendita
 
-Le presenti condizioni regolano la prenotazione e l'acquisto di prodotti tramite il sito **{{ site.title }}**.
+Le presenti condizioni regolano la prenotazione e l'acquisto di prodotti tramite il sito **{{ site.company_name }}**.
 
 ### 1. Oggetto del Servizio
 Il sito funge da catalogo online e strumento di prenotazione per i prodotti dell'orto. L'invio della lista prodotti tramite il sito non costituisce un acquisto immediato. La vendita effettiva e il perfezionamento del contratto avvengono esclusivamente tramite comunicazione diretta e conferma su WhatsApp al numero **{{ site.whatsapp_number }}**.

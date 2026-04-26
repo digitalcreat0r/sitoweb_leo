@@ -5,7 +5,7 @@ title: Privacy Policy
 
 # Informativa sulla Privacy
 
-La presente Informativa sulla privacy descrive come vengono raccolti, utilizzati e divulgati i dati personali dell'utente quando visita il sito o effettua un ordine tramite i canali indicati su **{{ site.title }}**.
+La presente Informativa sulla privacy descrive come vengono raccolti, utilizzati e divulgati i dati personali dell'utente quando visita il sito o effettua un ordine tramite i canali indicati su **{{ site.company_name }}**.
 
 ### 1. Titolare del Trattamento dei Dati
 Il titolare del trattamento è **{{ site.company_name }}**, con sede legale in **{{ site.address }}**.  
