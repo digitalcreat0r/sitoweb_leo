@@ -3,6 +3,9 @@ let cart = {};
 let currentOrderText = "";
 let initialLimit = 0;
 let isExpanded = false; // Traccia se l'utente ha visualizzato tutto
+let pressTimer;
+let pressInterval;
+let lastClickTime = 0;
 
 function getGridColumns() {
     const container = document.getElementById('product-list');
@@ -89,27 +92,60 @@ function showAllProducts() {
 
 function renderProductCard(p) {
     const qty = cart[p.id] || 0;
+    const displayQty = (qty % 1 === 0) ? qty : qty.toFixed(1);
     return `
         <div class="card">
             <img src="${p.img}" alt="${p.name}" loading="lazy">
             <h3>${p.name}</h3>
             <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
             <div class="controls">
-                <button class="btn-qty" onclick="changeQty(${p.id}, -1)">-</button>
-                <span id="qty-${p.id}">${qty}</span>
-                <button class="btn-qty" onclick="changeQty(${p.id}, 1)">+</button>
+                <button class="btn-qty" 
+                    onpointerdown="startChange(${p.id}, -1)" 
+                    onpointerup="stopChange()" 
+                    onpointerleave="stopChange()"
+                    oncontextmenu="event.preventDefault()">-</button>
+                <span id="qty-${p.id}">${displayQty}</span>
+                <button class="btn-qty" 
+                    onpointerdown="startChange(${p.id}, 1)" 
+                    onpointerup="stopChange()" 
+                    onpointerleave="stopChange()"
+                    oncontextmenu="event.preventDefault()">+</button>
             </div>
         </div>
     `;
 }
 
+function startChange(id, direction) {
+    const now = Date.now();
+    const isFastClick = (now - lastClickTime) < 300;
+    lastClickTime = now;
 
-function changeQty(id, delta) {
+    const step = isFastClick ? 0.5 : 0.1;
+    applyChange(id, direction * step);
+
+    stopChange();
+    pressTimer = setTimeout(() => {
+        pressInterval = setInterval(() => {
+            applyChange(id, direction * 0.5);
+        }, 150);
+    }, 500);
+}
+
+function stopChange() {
+    clearTimeout(pressTimer);
+    clearInterval(pressInterval);
+}
+
+function applyChange(id, delta) {
     if (!cart[id]) cart[id] = 0;
-    cart[id] += delta;
-    if (cart[id] < 0) cart[id] = 0;
+    let newQty = parseFloat((cart[id] + delta).toFixed(1));
+    if (newQty < 0) newQty = 0;
+    cart[id] = newQty;
     
-    document.getElementById(`qty-${id}`).innerText = cart[id];
+    const qtyElement = document.getElementById(`qty-${id}`);
+    if (qtyElement) {
+        qtyElement.innerText = (newQty % 1 === 0) ? newQty : newQty.toFixed(1);
+    }
     updateTotal();
 }
 
