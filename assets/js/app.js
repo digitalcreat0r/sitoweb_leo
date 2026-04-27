@@ -6,6 +6,8 @@ let isExpanded = false; // Traccia se l'utente ha visualizzato tutto
 let pressTimer;
 let pressInterval;
 let lastClickTime = 0;
+let rapidClickCount = 0;
+let lastTarget = null;
 
 function getGridColumns() {
     const container = document.getElementById('product-list');
@@ -117,10 +119,18 @@ function renderProductCard(p) {
 
 function startChange(id, direction) {
     const now = Date.now();
-    const isFastClick = (now - lastClickTime) < 300;
-    lastClickTime = now;
+    const currentTarget = `${id}-${direction}`;
+    
+    if (now - lastClickTime < 300 && lastTarget === currentTarget) {
+        rapidClickCount++;
+    } else {
+        rapidClickCount = 0;
+    }
 
-    const step = isFastClick ? 0.5 : 0.1;
+    lastClickTime = now;
+    lastTarget = currentTarget;
+
+    const step = (rapidClickCount >= 3) ? 0.5 : 0.1;
     applyChange(id, direction * step);
 
     stopChange();
