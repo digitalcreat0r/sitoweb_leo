@@ -35,7 +35,7 @@ async function loadProducts() {
                 name: (cols[0] || "").replace(/"/g, '').trim(),
                 price: parseFloat(cols[2]),
                 unit: (cols[3] || "").trim(),
-                available: (cols[4] || "").trim().toUpperCase() === 'SÌ',
+                available: (cols[4] || "").trim().toUpperCase() === 'SÌ' || (cols[4] || "").trim().toUpperCase() === 'SI',
                 img: cols[5] ? cols[5].trim() : 'https://via.placeholder.com/150?text=Verdura'
             };
 
