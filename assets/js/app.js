@@ -17,15 +17,43 @@ function getGridColumns() {
 }
 
 async function loadProducts() {
+    const cachedData = localStorage.getItem('la_mezza_luna_products');
+    const cachedTime = localStorage.getItem('la_mezza_luna_products_time');
+    const now = Date.now();
+
+    if (cachedData && cachedTime) {
+        try {
+            products = JSON.parse(cachedData);
+            renderProductGrid();
+            
+            // Se la cache è più recente di 5 minuti, non facciamo richieste di rete aggiuntive
+            if (now - parseInt(cachedTime) < 5 * 60 * 1000) {
+                console.log("Prodotti caricati da cache locale fresca.");
+                return;
+            }
+            
+            console.log("Cache locale scaduta. Avvio aggiornamento prodotti in background...");
+            fetchProducts(true);
+            return;
+        } catch (e) {
+            console.error("Errore nel parsing della cache dei prodotti, la rimuovo:", e);
+            localStorage.removeItem('la_mezza_luna_products');
+            localStorage.removeItem('la_mezza_luna_products_time');
+        }
+    }
+
+    // Se non c'è cache o è stata rimossa per errore, fa un fetch bloccante iniziale
+    await fetchProducts(false);
+}
+
+async function fetchProducts(isBackground = false) {
     try {
         const response = await fetch(AppConfig.sheetUrl);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.text();
         const rows = data.split('\n').slice(1);
 
-        const container = document.getElementById('product-list');
-        container.innerHTML = '';
-
-        // 1. Elabora tutti i dati e popola l'array products
+        const parsedProducts = [];
         rows.forEach((row, index) => {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (cols.length < 3) return;
@@ -39,28 +67,68 @@ async function loadProducts() {
                 img: cols[5] ? cols[5].trim() : 'https://via.placeholder.com/150?text=Verdura'
             };
 
-            if (p.available) products.push(p);
+            if (p.available) parsedProducts.push(p);
         });
 
-        renderProductGrid();
+        // Controlla se i dati del catalogo sono effettivamente cambiati
+        const productsChanged = JSON.stringify(products) !== JSON.stringify(parsedProducts);
+
+        if (productsChanged) {
+            // Se l'utente ha oggetti nel carrello, rimappiamoli sui nuovi ID (basandoci sul nome del prodotto)
+            const hasCartItems = Object.values(cart).some(q => q > 0);
+            if (hasCartItems && products.length > 0) {
+                const newCart = {};
+                parsedProducts.forEach(newP => {
+                    const oldP = products.find(op => op.name === newP.name);
+                    if (oldP && cart[oldP.id] !== undefined) {
+                        newCart[newP.id] = cart[oldP.id];
+                    }
+                });
+                cart = newCart;
+            }
+
+            products = parsedProducts;
+            renderProductGrid();
+            updateTotal();
+            console.log("Catalogo prodotti aggiornato con nuovi dati da Google Sheets.");
+        } else {
+            console.log("Nessuna modifica rilevata nel catalogo prodotti.");
+        }
+
+        // Salva sempre i dati aggiornati nella cache locale
+        localStorage.setItem('la_mezza_luna_products', JSON.stringify(parsedProducts));
+        localStorage.setItem('la_mezza_luna_products_time', Date.now().toString());
 
     } catch (error) {
-        console.error("Errore caricamento:", error);
-        document.getElementById('product-list').innerHTML = "Errore nel caricamento dei prodotti. Riprova più tardi.";
+        console.error("Errore durante il fetch dei prodotti:", error);
+        
+        // Se il fetch fallisce e non abbiamo nessun prodotto caricato (nemmeno da cache), mostra l'errore a schermo
+        if (!isBackground && products.length === 0) {
+            const container = document.getElementById('product-list');
+            if (container) {
+                container.innerHTML = '<p class="error-msg" style="grid-column: 1 / -1; text-align: center; color: #d62828; padding: 20px;">Errore nel caricamento dei prodotti. Controlla la connessione e riprova più tardi.</p>';
+            }
+        }
     }
 }
 
 function renderProductGrid() {
-    // Se abbiamo già mostrato tutto, non facciamo nulla al ridimensionamento
-    if (isExpanded || products.length === 0) return;
+    if (products.length === 0) return;
 
     const container = document.getElementById('product-list');
+    
+    if (isExpanded) {
+        container.innerHTML = products.map(p => renderProductCard(p)).join('');
+        const btnShowAll = document.getElementById('btn-show-all');
+        if (btnShowAll) btnShowAll.style.display = 'none';
+        return;
+    }
+
     const cols = getGridColumns();
     
     if (cols === 1) {
         initialLimit = 3;
     } else {
-       
         const fullRowsPossible = Math.floor(products.length / cols);
         
         if (fullRowsPossible >= 2) {
