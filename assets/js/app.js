@@ -47,8 +47,13 @@ async function loadProducts() {
 }
 
 async function fetchProducts(isBackground = false) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 secondi di timeout
+
     try {
-        const response = await fetch(AppConfig.sheetUrl);
+        const response = await fetch(AppConfig.sheetUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.text();
         const rows = data.split('\n').slice(1);
@@ -64,7 +69,7 @@ async function fetchProducts(isBackground = false) {
                 price: parseFloat(cols[2]),
                 unit: (cols[3] || "").trim(),
                 available: (cols[4] || "").trim().toUpperCase() === 'SÌ' || (cols[4] || "").trim().toUpperCase() === 'SI',
-                img: cols[5] ? cols[5].trim() : 'https://via.placeholder.com/150?text=Verdura'
+                img: cols[5] ? cols[5].trim() : 'https://placehold.co/150x150?text=Verdura'
             };
 
             if (p.available) parsedProducts.push(p);
@@ -100,16 +105,39 @@ async function fetchProducts(isBackground = false) {
         localStorage.setItem('la_mezza_luna_products_time', Date.now().toString());
 
     } catch (error) {
+        clearTimeout(timeoutId);
         console.error("Errore durante il fetch dei prodotti:", error);
         
         // Se il fetch fallisce e non abbiamo nessun prodotto caricato (nemmeno da cache), mostra l'errore a schermo
         if (!isBackground && products.length === 0) {
             const container = document.getElementById('product-list');
             if (container) {
-                container.innerHTML = '<p class="error-msg" style="grid-column: 1 / -1; text-align: center; color: #d62828; padding: 20px;">Errore nel caricamento dei prodotti. Controlla la connessione e riprova più tardi.</p>';
+                let errorMessage = "Errore nel caricamento dei prodotti. Controlla la connessione e riprova.";
+                if (error.name === 'AbortError') {
+                    errorMessage = "Il caricamento ha richiesto troppo tempo (timeout). Riprova.";
+                }
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 30px 10px;">
+                        <p class="error-msg" style="color: #d62828; margin-bottom: 15px; font-weight: 500;">${errorMessage}</p>
+                        <button class="btn-send" style="background-color: var(--primary); padding: 10px 24px; font-size: 0.95rem;" onclick="retryLoadProducts()">Riprova</button>
+                    </div>
+                `;
             }
         }
     }
+}
+
+async function retryLoadProducts() {
+    const container = document.getElementById('product-list');
+    if (container) {
+        container.innerHTML = `
+            <div class="product-loader">
+                <div class="spinner"></div>
+                <p>Caricamento prodotti in corso...</p>
+            </div>
+        `;
+    }
+    await fetchProducts(false);
 }
 
 function renderProductGrid() {
@@ -165,7 +193,7 @@ function renderProductCard(p) {
     const displayQty = (qty % 1 === 0) ? qty : qty.toFixed(1);
     return `
         <div class="card">
-            <img src="${p.img}" alt="${p.name}" loading="lazy">
+            <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=Immagine+non+disponibile'">
             <h3>${p.name}</h3>
             <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
             <div class="controls">
