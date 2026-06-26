@@ -269,6 +269,10 @@ footer {
     font-size: 0.95rem;
 }
 
+.footer-cache-wrapper {
+    margin-top: 15px;
+}
+
 .home-link {
     display: inline-block;
     margin-bottom: 1.5rem;

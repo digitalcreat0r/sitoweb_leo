@@ -317,6 +317,19 @@ function initModal() {
                Utilizzando il sito, accetti la nostra <a href="cookie-policy.html">Cookie Policy</a>.</p>
             <button class="btn-send" style="padding: 10px; font-size: 0.9rem;" onclick="acceptCookies()">Ho capito</button>
         </div>
+        <div id="clear-cache-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div style="text-align: center; font-size: 1.1rem; padding: 20px 0; color: #444; line-height: 1.5;">
+                    Sei sicuro di voler svuotare la cache?<br><strong>Tutti i dati locali verranno cancellati e la pagina sarà ricaricata.</strong>
+                </div>
+                <div class="modal-actions">
+                    <div class="modal-row">
+                        <button class="btn-cancel" onclick="closeClearCacheModal()">Annulla</button>
+                        <button class="btn-send" style="background-color: #d62828;" onclick="executeClearCache()">Svuota cache</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     
@@ -336,6 +349,61 @@ function resetCart() {
 
 function closeConfirmModal() {
     document.getElementById('confirm-modal').style.display = 'none';
+}
+
+function openClearCacheModal(event) {
+    if (event) event.preventDefault();
+    document.getElementById('clear-cache-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeClearCacheModal() {
+    document.getElementById('clear-cache-modal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function executeClearCache() {
+    // Svuota localStorage e sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Svuota cookies per l'origine corrente
+    try {
+        document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+    } catch (e) {
+        console.error("Errore nello svuotamento dei cookie:", e);
+    }
+
+    const promises = [];
+
+    // Svuota Cache Storage
+    if ('caches' in window) {
+        promises.push(
+            caches.keys().then(names => {
+                return Promise.all(names.map(name => caches.delete(name)));
+            }).catch(err => console.error("Errore nello svuotamento dei caches:", err))
+        );
+    }
+
+    // Disinstalla Service Worker
+    if ('serviceWorker' in navigator) {
+        promises.push(
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                return Promise.all(registrations.map(r => r.unregister()));
+            }).catch(err => console.error("Errore disinstallazione service worker:", err))
+        );
+    }
+
+    // Attendiamo il completamento delle attività asincrone prima di ricaricare la pagina
+    Promise.all(promises).then(() => {
+        closeClearCacheModal();
+        window.location.reload();
+    }).catch(() => {
+        closeClearCacheModal();
+        window.location.reload();
+    });
 }
 
 function executeResetCart() {
