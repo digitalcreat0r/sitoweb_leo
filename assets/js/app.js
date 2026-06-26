@@ -193,7 +193,7 @@ function renderProductCard(p) {
     const displayQty = (qty % 1 === 0) ? qty : qty.toFixed(1);
     return `
         <div class="card">
-            <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=Immagine+non+disponibile'">
+            <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=Immagine+non+disponibile'; updateProductImageFallback(${p.id});">
             <h3>${p.name}</h3>
             <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
             <div class="controls">
@@ -448,8 +448,25 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
 });
 
+function updateProductImageFallback(id) {
+    const product = products.find(p => p.id === id);
+    if (product) {
+        product.img = 'https://placehold.co/150x150?text=Immagine+non+disponibile';
+        try {
+            localStorage.setItem('la_mezza_luna_products', JSON.stringify(products));
+        } catch (e) {
+            console.error("Errore nel salvare la cache aggiornata con fallback:", e);
+        }
+    }
+}
+
 // Gestisce la rotazione del telefono o il ridimensionamento finestra PC
+let lastWidth = window.innerWidth;
 window.addEventListener('resize', () => {
+    const currentWidth = window.innerWidth;
+    if (currentWidth === lastWidth) return; // Salta il re-render se la larghezza non è cambiata (es. scroll mobile)
+    lastWidth = currentWidth;
+
     // Usiamo un piccolo timeout per evitare troppi calcoli durante il ridimensionamento fluido su PC
     clearTimeout(window.resizeTimer);
     window.resizeTimer = setTimeout(renderProductGrid, 100);
