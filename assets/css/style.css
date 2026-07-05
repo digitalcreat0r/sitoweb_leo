@@ -269,6 +269,10 @@ footer {
     font-size: 0.95rem;
 }
 
+.footer-cache-wrapper {
+    margin-top: 15px;
+}
+
 .home-link {
     display: inline-block;
     margin-bottom: 1.5rem;
@@ -455,4 +459,31 @@ footer {
 .cookie-banner a {
     color: var(--primary);
     text-decoration: underline;
+}
+
+/* Indicatore di caricamento prodotti premium */
+.product-loader {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    color: var(--primary);
+    font-weight: 600;
+    gap: 12px;
+}
+
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid rgba(45, 106, 79, 0.15);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

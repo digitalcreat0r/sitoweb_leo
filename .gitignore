@@ -4,6 +4,7 @@ _site/
 .jekyll-metadata
 
 vendor/
+immagini/
 .bundle/
 
 node_modules/

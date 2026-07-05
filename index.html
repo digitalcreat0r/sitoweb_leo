@@ -6,7 +6,10 @@ layout: default
     <section class="section-vetrina">
         <h2 class="section-title">I nostri prodotti</h2>
         <div id="product-list" class="product-grid">
-            <p>Caricamento prodotti in corso...</p>
+            <div class="product-loader">
+                <div class="spinner"></div>
+                <p>Caricamento prodotti in corso...</p>
+            </div>
         </div>
         <button id="btn-show-all" class="btn-secondary" style="display: none;" onclick="showAllProducts()">
             Mostra tutti i prodotti

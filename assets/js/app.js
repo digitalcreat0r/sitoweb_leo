@@ -17,15 +17,48 @@ function getGridColumns() {
 }
 
 async function loadProducts() {
+    const cachedData = localStorage.getItem('la_mezza_luna_products');
+    const cachedTime = localStorage.getItem('la_mezza_luna_products_time');
+    const now = Date.now();
+
+    if (cachedData && cachedTime) {
+        try {
+            products = JSON.parse(cachedData);
+            renderProductGrid();
+            
+            // Se la cache è più recente di 5 minuti, non facciamo richieste di rete aggiuntive
+            if (now - parseInt(cachedTime) < 5 * 60 * 1000) {
+                console.log("Prodotti caricati da cache locale fresca.");
+                return;
+            }
+            
+            console.log("Cache locale scaduta. Avvio aggiornamento prodotti in background...");
+            fetchProducts(true);
+            return;
+        } catch (e) {
+            console.error("Errore nel parsing della cache dei prodotti, la rimuovo:", e);
+            localStorage.removeItem('la_mezza_luna_products');
+            localStorage.removeItem('la_mezza_luna_products_time');
+        }
+    }
+
+    // Se non c'è cache o è stata rimossa per errore, fa un fetch bloccante iniziale
+    await fetchProducts(false);
+}
+
+async function fetchProducts(isBackground = false) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 secondi di timeout
+
     try {
-        const response = await fetch(AppConfig.sheetUrl);
+        const response = await fetch(AppConfig.sheetUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.text();
         const rows = data.split('\n').slice(1);
 
-        const container = document.getElementById('product-list');
-        container.innerHTML = '';
-
-        // 1. Elabora tutti i dati e popola l'array products
+        const parsedProducts = [];
         rows.forEach((row, index) => {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (cols.length < 3) return;
@@ -36,31 +69,94 @@ async function loadProducts() {
                 price: parseFloat(cols[2]),
                 unit: (cols[3] || "").trim(),
                 available: (cols[4] || "").trim().toUpperCase() === 'SÌ' || (cols[4] || "").trim().toUpperCase() === 'SI',
-                img: cols[5] ? cols[5].trim() : 'https://via.placeholder.com/150?text=Verdura'
+                img: cols[5] ? cols[5].trim() : 'https://placehold.co/150x150?text=Verdura'
             };
 
-            if (p.available) products.push(p);
+            if (p.available) parsedProducts.push(p);
         });
 
-        renderProductGrid();
+        // Controlla se i dati del catalogo sono effettivamente cambiati
+        const productsChanged = JSON.stringify(products) !== JSON.stringify(parsedProducts);
+
+        if (productsChanged) {
+            // Se l'utente ha oggetti nel carrello, rimappiamoli sui nuovi ID (basandoci sul nome del prodotto)
+            const hasCartItems = Object.values(cart).some(q => q > 0);
+            if (hasCartItems && products.length > 0) {
+                const newCart = {};
+                parsedProducts.forEach(newP => {
+                    const oldP = products.find(op => op.name === newP.name);
+                    if (oldP && cart[oldP.id] !== undefined) {
+                        newCart[newP.id] = cart[oldP.id];
+                    }
+                });
+                cart = newCart;
+            }
+
+            products = parsedProducts;
+            renderProductGrid();
+            updateTotal();
+            console.log("Catalogo prodotti aggiornato con nuovi dati da Google Sheets.");
+        } else {
+            console.log("Nessuna modifica rilevata nel catalogo prodotti.");
+        }
+
+        // Salva sempre i dati aggiornati nella cache locale
+        localStorage.setItem('la_mezza_luna_products', JSON.stringify(parsedProducts));
+        localStorage.setItem('la_mezza_luna_products_time', Date.now().toString());
 
     } catch (error) {
-        console.error("Errore caricamento:", error);
-        document.getElementById('product-list').innerHTML = "Errore nel caricamento dei prodotti. Riprova più tardi.";
+        clearTimeout(timeoutId);
+        console.error("Errore durante il fetch dei prodotti:", error);
+        
+        // Se il fetch fallisce e non abbiamo nessun prodotto caricato (nemmeno da cache), mostra l'errore a schermo
+        if (!isBackground && products.length === 0) {
+            const container = document.getElementById('product-list');
+            if (container) {
+                let errorMessage = "Errore nel caricamento dei prodotti. Controlla la connessione e riprova.";
+                if (error.name === 'AbortError') {
+                    errorMessage = "Il caricamento ha richiesto troppo tempo (timeout). Riprova.";
+                }
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 30px 10px;">
+                        <p class="error-msg" style="color: #d62828; margin-bottom: 15px; font-weight: 500;">${errorMessage}</p>
+                        <button class="btn-send" style="background-color: var(--primary); padding: 10px 24px; font-size: 0.95rem;" onclick="retryLoadProducts()">Riprova</button>
+                    </div>
+                `;
+            }
+        }
     }
 }
 
+async function retryLoadProducts() {
+    const container = document.getElementById('product-list');
+    if (container) {
+        container.innerHTML = `
+            <div class="product-loader">
+                <div class="spinner"></div>
+                <p>Caricamento prodotti in corso...</p>
+            </div>
+        `;
+    }
+    await fetchProducts(false);
+}
+
 function renderProductGrid() {
-    // Se abbiamo già mostrato tutto, non facciamo nulla al ridimensionamento
-    if (isExpanded || products.length === 0) return;
+    if (products.length === 0) return;
 
     const container = document.getElementById('product-list');
+    
+    if (isExpanded) {
+        container.innerHTML = products.map(p => renderProductCard(p)).join('');
+        const btnShowAll = document.getElementById('btn-show-all');
+        if (btnShowAll) btnShowAll.style.display = 'none';
+        return;
+    }
+
     const cols = getGridColumns();
     
     if (cols === 1) {
         initialLimit = 3;
     } else {
-       
         const fullRowsPossible = Math.floor(products.length / cols);
         
         if (fullRowsPossible >= 2) {
@@ -97,7 +193,7 @@ function renderProductCard(p) {
     const displayQty = (qty % 1 === 0) ? qty : qty.toFixed(1);
     return `
         <div class="card">
-            <img src="${p.img}" alt="${p.name}" loading="lazy">
+            <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=Immagine+non+disponibile'; updateProductImageFallback(${p.id});">
             <h3>${p.name}</h3>
             <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
             <div class="controls">
@@ -221,6 +317,19 @@ function initModal() {
                Utilizzando il sito, accetti la nostra <a href="cookie-policy.html">Cookie Policy</a>.</p>
             <button class="btn-send" style="padding: 10px; font-size: 0.9rem;" onclick="acceptCookies()">Ho capito</button>
         </div>
+        <div id="clear-cache-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div style="text-align: center; font-size: 1.1rem; padding: 20px 0; color: #444; line-height: 1.5;">
+                    Sei sicuro di voler svuotare la cache?<br><strong>Tutti i dati locali verranno cancellati e la pagina sarà ricaricata.</strong>
+                </div>
+                <div class="modal-actions">
+                    <div class="modal-row">
+                        <button class="btn-cancel" onclick="closeClearCacheModal()">Annulla</button>
+                        <button class="btn-send" style="background-color: #d62828;" onclick="executeClearCache()">Svuota cache</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     
@@ -240,6 +349,61 @@ function resetCart() {
 
 function closeConfirmModal() {
     document.getElementById('confirm-modal').style.display = 'none';
+}
+
+function openClearCacheModal(event) {
+    if (event) event.preventDefault();
+    document.getElementById('clear-cache-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeClearCacheModal() {
+    document.getElementById('clear-cache-modal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function executeClearCache() {
+    // Svuota localStorage e sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Svuota cookies per l'origine corrente
+    try {
+        document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+    } catch (e) {
+        console.error("Errore nello svuotamento dei cookie:", e);
+    }
+
+    const promises = [];
+
+    // Svuota Cache Storage
+    if ('caches' in window) {
+        promises.push(
+            caches.keys().then(names => {
+                return Promise.all(names.map(name => caches.delete(name)));
+            }).catch(err => console.error("Errore nello svuotamento dei caches:", err))
+        );
+    }
+
+    // Disinstalla Service Worker
+    if ('serviceWorker' in navigator) {
+        promises.push(
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                return Promise.all(registrations.map(r => r.unregister()));
+            }).catch(err => console.error("Errore disinstallazione service worker:", err))
+        );
+    }
+
+    // Attendiamo il completamento delle attività asincrone prima di ricaricare la pagina
+    Promise.all(promises).then(() => {
+        closeClearCacheModal();
+        window.location.reload();
+    }).catch(() => {
+        closeClearCacheModal();
+        window.location.reload();
+    });
 }
 
 function executeResetCart() {
@@ -352,8 +516,25 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
 });
 
+function updateProductImageFallback(id) {
+    const product = products.find(p => p.id === id);
+    if (product) {
+        product.img = 'https://placehold.co/150x150?text=Immagine+non+disponibile';
+        try {
+            localStorage.setItem('la_mezza_luna_products', JSON.stringify(products));
+        } catch (e) {
+            console.error("Errore nel salvare la cache aggiornata con fallback:", e);
+        }
+    }
+}
+
 // Gestisce la rotazione del telefono o il ridimensionamento finestra PC
+let lastWidth = window.innerWidth;
 window.addEventListener('resize', () => {
+    const currentWidth = window.innerWidth;
+    if (currentWidth === lastWidth) return; // Salta il re-render se la larghezza non è cambiata (es. scroll mobile)
+    lastWidth = currentWidth;
+
     // Usiamo un piccolo timeout per evitare troppi calcoli durante il ridimensionamento fluido su PC
     clearTimeout(window.resizeTimer);
     window.resizeTimer = setTimeout(renderProductGrid, 100);
