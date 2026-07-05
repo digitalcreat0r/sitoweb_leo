@@ -5,7 +5,7 @@ title: Condizioni di Vendita
 
 # Termini e Condizioni di Vendita
 
-Le presenti condizioni regolano la prenotazione e l'acquisto di prodotti tramite il sito **{{ site.company_name }}**.
+Le presenti condizioni regolano la prenotazione e l'acquisto di prodotti tramite il sito **{{ lamezzaluna.eu }}**.
 
 ### 1. Oggetto del Servizio
 Il sito funge da catalogo online e strumento di prenotazione per i prodotti dell'orto. L'invio della lista prodotti tramite il sito non costituisce un acquisto immediato. La vendita effettiva e il perfezionamento del contratto avvengono esclusivamente tramite comunicazione diretta e conferma su WhatsApp al numero **{{ site.whatsapp_number }}**.
@@ -26,6 +26,6 @@ Ai sensi dell'art. 59 del Codice del Consumo (D.Lgs. 206/2005), il diritto di re
 **{{ site.company_name }}** non è responsabile per eventuali errori tecnici nel caricamento dei dati (prezzi o disponibilità) derivanti da problemi di connessione con il database esterno (Google Sheets) o malfunzionamenti della piattaforma WhatsApp.
 
 ### 6. Informazioni Aziendali
-**{{ site.company_name }}**<br>
+**{{ lamezzaluna.eu }}**<br>
 P.IVA: **{{ site.p_iva }}**<br>
 C.F.: **{{ site.codice_fiscale }}**
