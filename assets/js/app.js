@@ -17,8 +17,8 @@ function getGridColumns() {
 }
 
 async function loadProducts() {
-    const cachedData = localStorage.getItem('la_mezza_luna_products');
-    const cachedTime = localStorage.getItem('la_mezza_luna_products_time');
+    const cachedData = localStorage.getItem('la_mezza_luna_products_v3');
+    const cachedTime = localStorage.getItem('la_mezza_luna_products_time_v3');
     const now = Date.now();
 
     if (cachedData && cachedTime) {
@@ -37,8 +37,8 @@ async function loadProducts() {
             return;
         } catch (e) {
             console.error("Errore nel parsing della cache dei prodotti, la rimuovo:", e);
-            localStorage.removeItem('la_mezza_luna_products');
-            localStorage.removeItem('la_mezza_luna_products_time');
+            localStorage.removeItem('la_mezza_luna_products_v3');
+            localStorage.removeItem('la_mezza_luna_products_time_v3');
         }
     }
 
@@ -86,7 +86,7 @@ async function fetchProducts(isBackground = false) {
                 price: parseFloat(cols[idxPrice]),
                 unit: (cols[idxUnit] || "").trim(),
                 available: (cols[idxAvailable] || "").trim().toUpperCase() === 'SÌ' || (cols[idxAvailable] || "").trim().toUpperCase() === 'SI',
-                img: `/assets/images/prodotti/${index + 2}.jpg`
+                img: `/prodotti/${index + 2}.jpg`
             };
 
             if (p.name && p.available) parsedProducts.push(p);
@@ -118,8 +118,8 @@ async function fetchProducts(isBackground = false) {
         }
 
         // Salva sempre i dati aggiornati nella cache locale
-        localStorage.setItem('la_mezza_luna_products', JSON.stringify(parsedProducts));
-        localStorage.setItem('la_mezza_luna_products_time', Date.now().toString());
+        localStorage.setItem('la_mezza_luna_products_v3', JSON.stringify(parsedProducts));
+        localStorage.setItem('la_mezza_luna_products_time_v3', Date.now().toString());
 
     } catch (error) {
         clearTimeout(timeoutId);
@@ -546,7 +546,7 @@ function handleImageError(imgElement, productId, productName, rowNumber, attempt
     const extensions = ['jpg', 'jpeg', 'png', 'webp'];
     if (attempt < extensions.length) {
         const nextExt = extensions[attempt];
-        const nextSrc = `/assets/images/prodotti/${rowNumber}.${nextExt}`;
+        const nextSrc = `/prodotti/${rowNumber}.${nextExt}`;
         
         imgElement.onload = function() {
             imgElement.onload = null; // evita loop
@@ -569,7 +569,7 @@ function updateProductImageCache(id, newSrc) {
     if (product && product.img !== newSrc) {
         product.img = newSrc;
         try {
-            localStorage.setItem('la_mezza_luna_products', JSON.stringify(products));
+            localStorage.setItem('la_mezza_luna_products_v3', JSON.stringify(products));
         } catch (e) {
             console.error("Errore nel salvare la cache aggiornata:", e);
         }
