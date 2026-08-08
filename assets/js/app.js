@@ -243,13 +243,16 @@ function startChange(id, direction) {
     lastClickTime = now;
     lastTarget = currentTarget;
 
-    const step = (rapidClickCount >= 3) ? 0.5 : 0.1;
+    const product = products.find(p => p.id === id);
+    const isDiscrete = product && product.unit.toLowerCase().trim() !== 'kg';
+
+    const step = isDiscrete ? 1 : ((rapidClickCount >= 3) ? 0.5 : 0.1);
     applyChange(id, direction * step);
 
     stopChange();
     pressTimer = setTimeout(() => {
         pressInterval = setInterval(() => {
-            applyChange(id, direction * 0.5);
+            applyChange(id, direction * (isDiscrete ? 1 : 0.5));
         }, 150);
     }, 500);
 }
@@ -261,7 +264,11 @@ function stopChange() {
 
 function applyChange(id, delta) {
     if (!cart[id]) cart[id] = 0;
-    let newQty = parseFloat((cart[id] + delta).toFixed(1));
+
+    const product = products.find(p => p.id === id);
+    const isDiscrete = product && product.unit.toLowerCase().trim() !== 'kg';
+
+    let newQty = parseFloat((cart[id] + delta).toFixed(isDiscrete ? 0 : 1));
     if (newQty < 0) newQty = 0;
     cart[id] = newQty;
 
