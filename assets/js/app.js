@@ -65,14 +65,12 @@ async function fetchProducts(isBackground = false) {
         const priceIdx = headers.findIndex(h => h.includes('prezzo'));
         const unitIdx = headers.findIndex(h => h.includes('unit') || h.includes('unità'));
         const availableIdx = headers.findIndex(h => h.includes('disponibil'));
-        const imgIdx = headers.findIndex(h => h.includes('foto') || h.includes('immagin') || h.includes('img'));
 
         // Fallback to original indices if headers are missing
         const idxName = nameIdx !== -1 ? nameIdx : 0;
         const idxPrice = priceIdx !== -1 ? priceIdx : 2;
         const idxUnit = unitIdx !== -1 ? unitIdx : 3;
         const idxAvailable = availableIdx !== -1 ? availableIdx : 4;
-        const idxImg = imgIdx !== -1 ? imgIdx : 5;
 
         const rows = lines.slice(1);
         const parsedProducts = [];
@@ -80,13 +78,15 @@ async function fetchProducts(isBackground = false) {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (cols.length <= Math.max(idxName, idxPrice)) return;
 
+            const name = (cols[idxName] || "").replace(/"/g, '').trim();
+
             const p = {
                 id: index,
-                name: (cols[idxName] || "").replace(/"/g, '').trim(),
+                name: name,
                 price: parseFloat(cols[idxPrice]),
                 unit: (cols[idxUnit] || "").trim(),
                 available: (cols[idxAvailable] || "").trim().toUpperCase() === 'SÌ' || (cols[idxAvailable] || "").trim().toUpperCase() === 'SI',
-                img: cols[idxImg] ? cols[idxImg].trim() : 'https://placehold.co/150x150?text=Verdura'
+                img: `/assets/images/prodotti/${index + 2}.jpg`
             };
 
             if (p.name && p.available) parsedProducts.push(p);
@@ -208,9 +208,11 @@ function showAllProducts() {
 function renderProductCard(p) {
     const qty = cart[p.id] || 0;
     const displayQty = (qty % 1 === 0) ? qty : qty.toFixed(1);
+    const rowNumber = p.id + 2;
+    const escapedName = p.name.replace(/'/g, "\\'");
     return `
         <div class="card">
-            <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=Immagine+non+disponibile'; updateProductImageFallback(${p.id});">
+            <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="handleImageError(this, ${p.id}, '${escapedName}', ${rowNumber}, 1)">
             <h3>${p.name}</h3>
             <div class="price">${p.price.toFixed(2)}€ / ${p.unit}</div>
             <div class="controls">
@@ -540,14 +542,36 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
 });
 
-function updateProductImageFallback(id) {
+function handleImageError(imgElement, productId, productName, rowNumber, attempt) {
+    const extensions = ['jpg', 'jpeg', 'png', 'webp'];
+    if (attempt < extensions.length) {
+        const nextExt = extensions[attempt];
+        const nextSrc = `/assets/images/prodotti/${rowNumber}.${nextExt}`;
+        
+        imgElement.onload = function() {
+            imgElement.onload = null; // evita loop
+            updateProductImageCache(productId, nextSrc);
+        };
+        
+        imgElement.src = nextSrc;
+        imgElement.setAttribute('onerror', `handleImageError(this, ${productId}, '${productName.replace(/'/g, "\\'")}', ${rowNumber}, ${attempt + 1})`);
+    } else {
+        imgElement.onerror = null;
+        imgElement.onload = null;
+        const placeholder = `https://placehold.co/150x150?text=${encodeURIComponent(productName)}`;
+        imgElement.src = placeholder;
+        updateProductImageCache(productId, placeholder);
+    }
+}
+
+function updateProductImageCache(id, newSrc) {
     const product = products.find(p => p.id === id);
-    if (product) {
-        product.img = 'https://placehold.co/150x150?text=Immagine+non+disponibile';
+    if (product && product.img !== newSrc) {
+        product.img = newSrc;
         try {
             localStorage.setItem('la_mezza_luna_products', JSON.stringify(products));
         } catch (e) {
-            console.error("Errore nel salvare la cache aggiornata con fallback:", e);
+            console.error("Errore nel salvare la cache aggiornata:", e);
         }
     }
 }
